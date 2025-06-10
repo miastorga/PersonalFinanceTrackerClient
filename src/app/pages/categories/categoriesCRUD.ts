@@ -463,7 +463,7 @@ import { forkJoin } from 'rxjs';
   `,
   providers: [ConfirmationService, MessageService]
 })
-export class TransactionsCRUD implements OnInit {
+export class CategoriesCRUD implements OnInit {
   loading: boolean = false;
   editMode: boolean = false;
   currentTransactionId: string | null = null;

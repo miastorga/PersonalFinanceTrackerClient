@@ -47,6 +47,27 @@ export interface Transaction {
   accountId: string | null;
 }
 
+export interface CreateTransaction {
+  amount: number;
+  transactionType: "gasto" | "ingreso";
+  categoryId: string;
+  date: string;
+  description: string;
+  accountId: string | null;
+}
+
+export interface CreateTransactionResponse {
+  transactionId: string
+  amount: number;
+  transactionType: "gasto" | "ingreso";
+  categoryId: string;
+  categoryName: string;
+  date: string;
+  description: string;
+  accountId: string | null;
+  accountName: string | null;
+}
+
 export interface TransactionResponse {
   items: Transaction[];
   totalCount: number;
@@ -79,10 +100,18 @@ export class TransactionsService {
     )
   }
 
-  createTransaction() {
-    // return this.http.post<Transaction>(this.URL).pipe(
-    //   catchError(this.handleError)
-    // )
+  createTransaction(params: CreateTransaction) {
+    // const httpParams = params ? this.objectToHttpParams(params) : undefined
+    console.log(params)
+    return this.http.post<CreateTransactionResponse>(this.URL, params).pipe(
+      catchError(this.handleError)
+    )
+  }
+
+  removeTransaction(id: string) {
+    return this.http.delete<void>(`${this.URL}/${id}`).pipe(
+      catchError(this.handleError)
+    )
   }
   private objectToHttpParams(obj: any): HttpParams {
     let params = new HttpParams();

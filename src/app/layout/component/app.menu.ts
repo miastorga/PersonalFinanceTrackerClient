@@ -29,7 +29,12 @@ export class AppMenu {
         icon: 'pi pi-fw pi-sign-in',
         routerLink: ['/login']
       },
-      { label: 'Finanzas', items: [{ label: 'Transacciones', icon: 'pi pi-fw pi-id-card', routerLink: ['/pages/transacciones'] }] },
+      {
+        label: 'Finanzas', items: [
+          { label: 'Transacciones', icon: 'pi pi-fw pi-id-card', routerLink: ['/pages/transacciones'] },
+          { label: 'Categorias', icon: 'pi pi-fw pi-id-card', routerLink: ['/pages/categorias'] }
+        ]
+      },
       {
         label: 'UI Components',
         items: [

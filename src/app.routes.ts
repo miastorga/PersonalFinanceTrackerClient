@@ -7,7 +7,8 @@ import { Notfound } from './app/pages/notfound/notfound';
 import { Login } from './app/pages/auth/login';
 import { AuthGuard } from './app/pages/service/auth.guard';
 import { NoAuthGuard } from './app/pages/service/no-auth.guard';
-import { TransactionsCRUD } from './app/pages/transactions/TransactionsCRUD';
+import { TransactionsCRUD } from './app/pages/transactions/transactionsCRUD';
+import { CategoriesCRUD } from './app/pages/categories/categoriesCRUD';
 
 export const appRoutes: Routes = [
   {
@@ -16,6 +17,7 @@ export const appRoutes: Routes = [
     children: [
       { path: '', component: Dashboard, canActivate: [AuthGuard] },
       { path: 'transacciones', component: TransactionsCRUD, canActivate: [NoAuthGuard] },
+      { path: 'categorias', component: CategoriesCRUD, canActivate: [NoAuthGuard] },
       { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
       // { path: 'documentation', component: Documentation },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
