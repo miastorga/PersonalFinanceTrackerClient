@@ -101,7 +101,6 @@ export class TransactionsService {
   }
 
   createTransaction(params: CreateTransaction) {
-    // const httpParams = params ? this.objectToHttpParams(params) : undefined
     console.log(params)
     return this.http.post<CreateTransactionResponse>(this.URL, params).pipe(
       catchError(this.handleError)
@@ -113,6 +112,15 @@ export class TransactionsService {
       catchError(this.handleError)
     )
   }
+
+  updateTransaction(id: string, params: CreateTransaction) {
+    console.log(id)
+    console.log(params)
+    return this.http.put<CreateTransaction>(`${this.URL}/${id}`, params).pipe(
+      catchError(this.handleError)
+    )
+  }
+
   private objectToHttpParams(obj: any): HttpParams {
     let params = new HttpParams();
     Object.keys(obj).forEach(key => {

@@ -215,6 +215,149 @@ import { forkJoin } from 'rxjs';
                 (click)="deleteTransaction(transaction)" />
             </td>
           </tr>
+
+              <!-- MODAL PARA AGREGAR/EDITAR TRANSACCIÓN -->
+          <p-dialog
+            [header]="editMode ? 'Editar Transacción' : 'Nueva Transacción'"
+            [(visible)]="displayAddTransactionDialog"
+            [modal]="true"
+            [style]="{width: '450px'}"
+            [draggable]="false"
+            [resizable]="false"
+            [closable]="true">
+
+            <ng-template #content>
+              <form [formGroup]="transactionForm" (ngSubmit)="onSubmitTransaction(transaction.id)">
+                <div class="grid grid-cols-1 gap-4">
+
+                  <!-- Monto -->
+                  <div class="field">
+                    <label for="amount" class="block text-sm font-medium mb-2">Monto *</label>
+                    <p-inputNumber
+                      id="amount"
+                      formControlName="amount"
+                      mode="decimal"
+                      [useGrouping]="false"
+                      [minFractionDigits]="0"
+                      [maxFractionDigits]="2"
+                      placeholder="0"
+                      class="w-full">
+                    </p-inputNumber>
+                    <small class="text-red-500" *ngIf="transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched">
+                      El monto es requerido
+                    </small>
+                  </div>
+
+                  <!-- Descripción -->
+                  <div class="field">
+                    <label for="description" class="block text-sm font-medium mb-2">Descripción *</label>
+                    <input
+                      id="description"
+                      type="text"
+                      pInputText
+                      formControlName="description"
+                      placeholder="Ingrese una descripción"
+                      class="w-full">
+                    <small class="text-red-500" *ngIf="transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched">
+                      La descripción es requerida
+                    </small>
+                  </div>
+
+                  <!-- Fecha -->
+                  <div class="field">
+                    <label for="date" class="block text-sm font-medium mb-2">Fecha *</label>
+                    <p-calendar
+                      id="date"
+                      formControlName="date"
+                      dateFormat="dd/mm/yy"
+                      [showIcon]="true"
+                      placeholder="Seleccione una fecha"
+                      class="w-full">
+                    </p-calendar>
+                    <small class="text-red-500" *ngIf="transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched">
+                      La fecha es requerida
+                    </small>
+                  </div>
+
+                  <!-- Tipo de Transacción -->
+                  <div class="field">
+                    <label for="transactionType" class="block text-sm font-medium mb-2">Tipo de Transacción *</label>
+                    <p-select
+                      id="transactionType"
+                      formControlName="transactionType"
+                      [options]="transactionTypes"
+                      placeholder="Seleccione un tipo"
+                      optionLabel="label"
+                      optionValue="value"
+                      class="w-full"
+                      [appendTo]="'body'">
+                    </p-select>
+                    <small class="text-red-500" *ngIf="transactionForm.get('transactionType')?.invalid && transactionForm.get('transactionType')?.touched">
+                      El tipo de transacción es requerido
+                    </small>
+                  </div>
+
+                  <!-- Categoría -->
+                  <div class="field">
+                    <label for="categoryName" class="block text-sm font-medium mb-2">Categoría *</label>
+                    <p-select
+                      id="categoryName"
+                      formControlName="categoryName"
+                      [options]="categories"
+                      placeholder="Seleccione una categoría"
+                      optionLabel="label"
+                      optionValue="value"
+                      class="w-full"
+                      [appendTo]="'body'">
+                    </p-select>
+                    <small class="text-red-500" *ngIf="transactionForm.get('categoryName')?.invalid && transactionForm.get('categoryName')?.touched">
+                      La categoría es requerida
+                    </small>
+                  </div>
+
+                  <!-- Cuenta -->
+                  <div class="field">
+                    <label for="accountId" class="block text-sm font-medium mb-2">Cuenta *</label>
+                    <p-select
+                      id="accountId"
+                      formControlName="accountId"
+                      placeholder="Seleccione una cuenta"
+                      optionLabel="label"
+                      optionValue="value"
+                      class="w-full"
+                      [appendTo]="'body'"
+                      [style]="{'min-width': '100%'}">
+                    </p-select>
+                    <small class="text-red-500" *ngIf="transactionForm.get('accountId')?.invalid && transactionForm.get('accountId')?.touched">
+                      La cuenta es requerida
+                    </small>
+                  </div>
+
+                </div>
+              </form>
+            </ng-template>
+
+            <ng-template #footer>
+              <div class="flex justify-end gap-2">
+                <button
+                  pButton
+                  label="Cancelar"
+                  icon="pi pi-times"
+                  class="p-button-text"
+                  (click)="hideAddTransactionDialog()">
+                </button>
+                <button
+                  pButton
+                  [label]="editMode ? 'Actualizar' : 'Guardar'"
+                  icon="pi pi-check"
+                  class="p-button-success"
+                  [disabled]="transactionForm.invalid || savingTransaction"
+                  [loading]="savingTransaction"
+                  (click)="onSubmitTransaction(transaction.id)">
+                </button>
+              </div>
+            </ng-template>
+          </p-dialog>
         </ng-template>
 
         @if (loading == false) {
@@ -302,148 +445,7 @@ import { forkJoin } from 'rxjs';
       </div>
     </div>
 
-    <!-- MODAL PARA AGREGAR/EDITAR TRANSACCIÓN -->
-    <p-dialog
-      [header]="editMode ? 'Editar Transacción' : 'Nueva Transacción'"
-      [(visible)]="displayAddTransactionDialog"
-      [modal]="true"
-      [style]="{width: '450px'}"
-      [draggable]="false"
-      [resizable]="false"
-      [closable]="true">
 
-      <ng-template #content>
-        <form [formGroup]="transactionForm" (ngSubmit)="onSubmitTransaction()">
-          <div class="grid grid-cols-1 gap-4">
-
-            <!-- Monto -->
-            <div class="field">
-              <label for="amount" class="block text-sm font-medium mb-2">Monto *</label>
-              <p-inputNumber
-                id="amount"
-                formControlName="amount"
-                mode="decimal"
-                [useGrouping]="false"
-                [minFractionDigits]="0"
-                [maxFractionDigits]="2"
-                placeholder="0"
-                class="w-full">
-              </p-inputNumber>
-              <small class="text-red-500" *ngIf="transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched">
-                El monto es requerido
-              </small>
-            </div>
-
-            <!-- Descripción -->
-            <div class="field">
-              <label for="description" class="block text-sm font-medium mb-2">Descripción *</label>
-              <input
-                id="description"
-                type="text"
-                pInputText
-                formControlName="description"
-                placeholder="Ingrese una descripción"
-                class="w-full">
-              <small class="text-red-500" *ngIf="transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched">
-                La descripción es requerida
-              </small>
-            </div>
-
-            <!-- Fecha -->
-            <div class="field">
-              <label for="date" class="block text-sm font-medium mb-2">Fecha *</label>
-              <p-calendar
-                id="date"
-                formControlName="date"
-                dateFormat="dd/mm/yy"
-                [showIcon]="true"
-                placeholder="Seleccione una fecha"
-                class="w-full">
-              </p-calendar>
-              <small class="text-red-500" *ngIf="transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched">
-                La fecha es requerida
-              </small>
-            </div>
-
-            <!-- Tipo de Transacción -->
-            <div class="field">
-              <label for="transactionType" class="block text-sm font-medium mb-2">Tipo de Transacción *</label>
-              <p-select
-                id="transactionType"
-                formControlName="transactionType"
-                [options]="transactionTypes"
-                placeholder="Seleccione un tipo"
-                optionLabel="label"
-                optionValue="value"
-                class="w-full"
-                [appendTo]="'body'">
-              </p-select>
-              <small class="text-red-500" *ngIf="transactionForm.get('transactionType')?.invalid && transactionForm.get('transactionType')?.touched">
-                El tipo de transacción es requerido
-              </small>
-            </div>
-
-            <!-- Categoría -->
-            <div class="field">
-              <label for="categoryName" class="block text-sm font-medium mb-2">Categoría *</label>
-              <p-select
-                id="categoryName"
-                formControlName="categoryName"
-                [options]="categories"
-                placeholder="Seleccione una categoría"
-                optionLabel="label"
-                optionValue="value"
-                class="w-full"
-                [appendTo]="'body'">
-              </p-select>
-              <small class="text-red-500" *ngIf="transactionForm.get('categoryName')?.invalid && transactionForm.get('categoryName')?.touched">
-                La categoría es requerida
-              </small>
-            </div>
-
-            <!-- Cuenta -->
-            <div class="field">
-              <label for="accountId" class="block text-sm font-medium mb-2">Cuenta *</label>
-              <p-select
-                id="accountId"
-                formControlName="accountId"
-                placeholder="Seleccione una cuenta"
-                optionLabel="label"
-                optionValue="value"
-                class="w-full"
-                [appendTo]="'body'"
-                [style]="{'min-width': '100%'}">
-              </p-select>
-              <small class="text-red-500" *ngIf="transactionForm.get('accountId')?.invalid && transactionForm.get('accountId')?.touched">
-                La cuenta es requerida
-              </small>
-            </div>
-
-          </div>
-        </form>
-      </ng-template>
-
-      <ng-template #footer>
-        <div class="flex justify-end gap-2">
-          <button
-            pButton
-            label="Cancelar"
-            icon="pi pi-times"
-            class="p-button-text"
-            (click)="hideAddTransactionDialog()">
-          </button>
-          <button
-            pButton
-            [label]="editMode ? 'Actualizar' : 'Guardar'"
-            icon="pi pi-check"
-            class="p-button-success"
-            [disabled]="transactionForm.invalid || savingTransaction"
-            [loading]="savingTransaction"
-            (click)="onSubmitTransaction()">
-          </button>
-        </div>
-      </ng-template>
-    </p-dialog>
 
     <p-confirmdialog [style]="{ width: '450px' }" />
   `,
@@ -639,7 +641,7 @@ export class CategoriesCRUD implements OnInit {
   }
 
 
-  onSubmitTransaction() {
+  onSubmitTransaction(transaccionId: string) {
     console.log('submit')
     if (this.transactionForm.valid) {
       this.savingTransaction = true;
@@ -660,7 +662,7 @@ export class CategoriesCRUD implements OnInit {
       console.log('Datos de la transacción:', transactionData);
       try {
         if (this.editMode) {
-          // Lógica para actualizar transacción existente
+          this.transactionService.updateTransaction(transaccionId, transactionData)
           this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
