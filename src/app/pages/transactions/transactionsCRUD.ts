@@ -216,7 +216,25 @@ import { forkJoin } from 'rxjs';
             </td>
           </tr>
              <!-- MODAL PARA AGREGAR/EDITAR TRANSACCIÓN -->
-            <p-dialog
+     
+        </ng-template>
+
+        @if (loading == false) {
+          <ng-template #emptymessage>
+            <tr>
+              <td colspan="8">No se encontraron transacciones.</td>
+            </tr>
+          </ng-template>
+        }
+      </p-table>
+
+      <!-- SPINNER DE CARGA -->
+      @if(loading == true){
+        <div class="flex justify-center items-center py-8">
+          <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #6366f1;"></i>
+        </div>
+      }
+      <p-dialog
               [header]="editMode ? 'Editar Transacción' : 'Nueva Transacción'"
               [(visible)]="displayAddTransactionDialog"
               [modal]="true"
@@ -357,24 +375,6 @@ import { forkJoin } from 'rxjs';
                 </div>
               </ng-template>
             </p-dialog>
-        </ng-template>
-
-        @if (loading == false) {
-          <ng-template #emptymessage>
-            <tr>
-              <td colspan="8">No se encontraron transacciones.</td>
-            </tr>
-          </ng-template>
-        }
-      </p-table>
-
-      <!-- SPINNER DE CARGA -->
-      @if(loading == true){
-        <div class="flex justify-center items-center py-8">
-          <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #6366f1;"></i>
-        </div>
-      }
-
       <!-- PAGINACIÓN PERSONALIZADA -->
       <div class="flex justify-between items-center mt-4 p-3 border-t">
         <div class="flex items-center gap-2">
