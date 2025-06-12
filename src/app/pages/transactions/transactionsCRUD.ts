@@ -26,6 +26,9 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { CreateTransaction, QueryParametersTransaction, Transaction, TransactionResponse, TransactionsService } from '../service/transactions.service';
 import { forkJoin } from 'rxjs';
+import { CategoriesService, Category } from '../service/categories.service';
+import { Account, AccountsService } from '../service/accounts.service';
+import { PaginationService } from '../service/pagination.service';
 
 @Component({
   selector: 'app-transactions-crud',
@@ -87,7 +90,7 @@ import { forkJoin } from 'rxjs';
 
       <p-table
         #dt1
-        [value]="transactionSignal()"
+        [value]="paginationService.items()"
         dataKey="transactionId" 
         selectionMode="multiple"  
         [showCurrentPageReport]="false"
@@ -104,12 +107,12 @@ import { forkJoin } from 'rxjs';
             <h5 class="m-0">Gestión de Transacciones</h5>
             <div class="flex gap-2">
               <button pButton label="Limpiar" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
-              <p-iconfield iconPosition="left" class="ml-auto">
+              <!-- <p-iconfield iconPosition="left" class="ml-auto">
                 <p-inputicon>
                   <i class="pi pi-search"></i>
                 </p-inputicon>
                 <input pInputText type="text" (input)="onGlobalFilter(dt1, $event)" placeholder="Buscar transacciones..." />
-              </p-iconfield>
+              </p-iconfield> -->
             </div>
           </div>
         </ng-template>
@@ -198,7 +201,7 @@ import { forkJoin } from 'rxjs';
               />
             </td> 
             <td>
-              <p-tag [value]="transaction.accountId ?? 'Sin Cuenta'" styleClass="dark:!bg-surface-900 " />
+              <p-tag [value]="transaction.accountId ?? 'Sin Cuenta'" styleClass="dark:!bg-surface-900 " [severity]="getTransactionAccountIdSeverity(transaction.accountId)"/>
             </td>
             <td>
               <p-button 
@@ -219,7 +222,7 @@ import { forkJoin } from 'rxjs';
      
         </ng-template>
 
-        @if (loading == false) {
+        @if (paginationService.loading() == false) {
           <ng-template #emptymessage>
             <tr>
               <td colspan="8">No se encontraron transacciones.</td>
@@ -229,7 +232,7 @@ import { forkJoin } from 'rxjs';
       </p-table>
 
       <!-- SPINNER DE CARGA -->
-      @if(loading == true){
+      @if(paginationService.loading() == true){
         <div class="flex justify-center items-center py-8">
           <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #6366f1;"></i>
         </div>
@@ -320,10 +323,10 @@ import { forkJoin } from 'rxjs';
                       <p-select
                         id="categoryName"
                         formControlName="categoryName"
-                        [options]="categories"
+                        [options]="categoriesSignal()"
                         placeholder="Seleccione una categoría"
-                        optionLabel="label"
-                        optionValue="value"
+                        optionLabel="categoryName"
+                        optionValue="categoryId"
                         class="w-full"
                         [appendTo]="'body'">
                       </p-select>
@@ -334,20 +337,18 @@ import { forkJoin } from 'rxjs';
 
                     <!-- Cuenta -->
                     <div class="field">
-                      <label for="accountId" class="block text-sm font-medium mb-2">Cuenta *</label>
+                      <label for="accountId" class="block text-sm font-medium mb-2">Cuenta</label>
                       <p-select
                         id="accountId"
                         formControlName="accountId"
                         placeholder="Seleccione una cuenta"
-                        optionLabel="label"
-                        optionValue="value"
+                        [options]="accountsSignal()"
+                        optionLabel="accountName"
+                        optionValue="accountId"
                         class="w-full"
                         [appendTo]="'body'"
                         [style]="{'min-width': '100%'}">
                       </p-select>
-                      <small class="text-red-500" *ngIf="transactionForm.get('accountId')?.invalid && transactionForm.get('accountId')?.touched">
-                        La cuenta es requerida
-                      </small>
                     </div>
 
                   </div>
@@ -379,62 +380,52 @@ import { forkJoin } from 'rxjs';
       <div class="flex justify-between items-center mt-4 p-3 border-t">
         <div class="flex items-center gap-2">
           <span class="text-sm text-gray-600">
-            Mostrando {{ getStartRecord() }} a {{ getEndRecord() }} de {{ paginationData().totalCount }} registros
+            Mostrando {{ paginationService.getStartRecord() }} a {{ paginationService.getEndRecord() }} de {{ paginationService.paginationData().totalCount }} registros
           </span>
         </div>
         
         <div class="flex items-center gap-2">
           <!-- Botón Primera Página -->
-          <button 
-            pButton 
-            icon="pi pi-angle-double-left" 
-            class="p-button-text p-button-sm"
-            [disabled]="!paginationData().hasPreviousPage || loading"
-            (click)="goToFirstPage()"
-            pTooltip="Primera página">
-          </button>
-          
-          <!-- Botón Página Anterior -->
-          <button 
-            pButton 
-            icon="pi pi-angle-left" 
-            class="p-button-text p-button-sm"
-            [disabled]="!paginationData().hasPreviousPage || loading"
-            (click)="goToPreviousPage()"
-            pTooltip="Página anterior">
-          </button>
-          
-          <!-- Información de página actual -->
-          <span class="px-3 py-1 text-sm">
-            Página {{ paginationData().currentPage }} de {{ paginationData().totalPages }}
-          </span>
-          
-          <!-- Botón Página Siguiente -->
-          <button 
-            pButton 
-            icon="pi pi-angle-right" 
-            class="p-button-text p-button-sm"
-            [disabled]="!paginationData().hasNextPage || loading"
-            (click)="goToNextPage()"
-            pTooltip="Página siguiente">
-          </button>
-          
-          <!-- Botón Última Página -->
-          <button 
-            pButton 
-            icon="pi pi-angle-double-right" 
-            class="p-button-text p-button-sm"
-            [disabled]="!paginationData().hasNextPage || loading"
-            (click)="goToLastPage()"
-            pTooltip="Última página">
-          </button>
+          <button
+  pButton
+  icon="pi pi-angle-double-left"
+  class="p-button-text p-button-sm"
+  [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
+  (click)="goToFirstPage()"
+  pTooltip="Primera página">
+</button>
+
+<button
+  pButton
+  icon="pi pi-angle-left"
+  class="p-button-text p-button-sm"
+  [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
+  (click)="goToPreviousPage()"
+  pTooltip="Página anterior">
+</button>
+
+<button
+  pButton
+  icon="pi pi-angle-right"
+  class="p-button-text p-button-sm"
+  [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
+  (click)="goToNextPage()"
+  pTooltip="Página siguiente">
+</button>
+
+<button
+  pButton
+  icon="pi pi-angle-double-right"
+  class="p-button-text p-button-sm"
+  [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
+  (click)="goToLastPage()"
+  pTooltip="Última página">
+</button>
         </div>
-        
-        <!-- Selector de filas por página -->
         <div class="flex items-center gap-2">
           <label class="text-sm">Filas por página:</label>
           <p-select 
-            [options]="rowsPerPageOptions" 
+            [options]="paginationService.rowsPerPageOptions"
             [(ngModel)]="currentPageSize"
             (onChange)="onRowsPerPageChange($event)"
             [style]="{'min-width': '80px'}"
@@ -465,6 +456,15 @@ import { forkJoin } from 'rxjs';
   providers: [ConfirmationService, MessageService]
 })
 export class TransactionsCRUD implements OnInit {
+  // Servicios inyectados
+  fb = inject(FormBuilder);
+  messageService = inject(MessageService);
+  transactionService = inject(TransactionsService);
+  confirmationService = inject(ConfirmationService);
+  categoriesService = inject(CategoriesService)
+  accountService = inject(AccountsService)
+  paginationService = inject(PaginationService)
+
   loading: boolean = false;
   editMode: boolean = false;
   currentTransactionId: string | null = null;
@@ -474,6 +474,8 @@ export class TransactionsCRUD implements OnInit {
 
   // Signals para transacciones y paginación
   transactionSignal = signal<Transaction[]>([]);
+  categoriesSignal = signal<Category[]>([])
+  accountsSignal = signal<Account[]>([])
   paginationData = signal<{
     totalCount: number;
     pageSize: number;
@@ -490,12 +492,6 @@ export class TransactionsCRUD implements OnInit {
     hasNextPage: false
   });
 
-  // Servicios inyectados
-  transactionService = inject(TransactionsService);
-  fb = inject(FormBuilder);
-  messageService = inject(MessageService);
-  confirmationService = inject(ConfirmationService);
-
   // Variables para el formulario y modal
   displayAddTransactionDialog = false;
   transactionForm!: FormGroup;
@@ -503,35 +499,17 @@ export class TransactionsCRUD implements OnInit {
   selectedTransactions!: Transaction[] | null;
 
   // Opciones para dropdowns
-  rowsPerPageOptions = [
-    { label: '5', value: 5 },
-    { label: '10', value: 10 },
-    { label: '25', value: 25 },
-    { label: '50', value: 50 }
-  ];
+  // rowsPerPageOptions = [
+  //   { label: '5', value: 5 },
+  //   { label: '10', value: 10 },
+  //   { label: '25', value: 25 },
+  //   { label: '50', value: 50 }
+  // ];
 
   transactionTypes = [
     { label: 'Ingreso', value: 'ingreso' },
     { label: 'Gasto', value: 'gasto' },
   ];
-
-  categories = [
-    { label: 'Alimentación', value: 'FOOD' },
-    { label: 'Transporte', value: 'TRANSPORT' },
-    { label: 'Entretenimiento', value: 'ENTERTAINMENT' },
-    { label: 'Salud', value: 'HEALTH' },
-    { label: 'Servicios', value: 'UTILITIES' },
-    { label: 'Compras', value: 'SHOPPING' },
-    { label: 'Educación', value: 'EDUCATION' },
-    { label: 'Otros', value: 'OTHER' }
-  ];
-
-  // accounts = [
-  //   { label: 'Cuenta Corriente', value: 'CHECKING' },
-  //   { label: 'Cuenta de Ahorros', value: 'SAVINGS' },
-  //   { label: 'Tarjeta de Crédito', value: 'CREDIT_CARD' },
-  //   { label: 'Efectivo', value: 'CASH' }
-  // ];
 
   currentPageSize = 5;
 
@@ -541,7 +519,10 @@ export class TransactionsCRUD implements OnInit {
 
   ngOnInit() {
     console.log('TRANSACTIONS CRUD INIT');
-    this.loadTransactions();
+    this.paginationService.initialize(5);
+    this.loadTransactions()
+    this.loadCategories()
+    this.loadAccounts()
   }
 
   initializeForm() {
@@ -555,31 +536,20 @@ export class TransactionsCRUD implements OnInit {
     });
   }
 
-  /**
-   * Carga las transacciones usando la paginación del backend
-   */
   loadTransactions() {
     this.loading = true;
+    this.paginationService.loadData((page, pageSize) =>
+      this.transactionService.getTransactions({ page, results: pageSize })
+    );
+  }
 
-    const query: QueryParametersTransaction = {
-      page: this.paginationData().currentPage,
-      results: this.paginationData().pageSize
-    };
+  loadCategories() {
+    this.loading = true;
+    this.categoriesService.getCategories().subscribe({
+      next: (response: Category[]) => {
+        console.log('categories data:', response);
 
-    this.transactionService.getTransactions(query).subscribe({
-      next: (response: TransactionResponse) => {
-        console.log('Transaction data:', response);
-
-        this.transactionSignal.set(response.items);
-
-        this.paginationData.set({
-          totalCount: response.totalCount,
-          pageSize: response.pageSize,
-          currentPage: response.currentPage,
-          totalPages: response.totalPages,
-          hasPreviousPage: response.hasPreviousPage,
-          hasNextPage: response.hasNextPage
-        });
+        this.categoriesSignal.set(response)
 
         this.loading = false;
       },
@@ -587,9 +557,25 @@ export class TransactionsCRUD implements OnInit {
         console.error('Error getting transactions:', error);
         this.loading = false;
       }
-    });
+    })
   }
 
+  loadAccounts() {
+    this.loading = true
+    this.accountService.getAccounts().subscribe({
+      next: (response: Account[]) => {
+        console.log('accoutns data:', response);
+
+        this.accountsSignal.set(response)
+
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error getting transactions:', error);
+        this.loading = false;
+      }
+    })
+  }
   // Métodos para el modal
   showAddTransactionDialog() {
     this.editMode = false;
@@ -603,7 +589,6 @@ export class TransactionsCRUD implements OnInit {
     this.currentTransactionId = transaction.transactionId || null;
     this.displayAddTransactionDialog = true;
 
-    // Llenar el formulario con los datos de la transacción
     this.transactionForm.patchValue({
       amount: transaction.amount,
       description: transaction.description,
@@ -639,7 +624,6 @@ export class TransactionsCRUD implements OnInit {
     };
   }
 
-
   onSubmitTransaction() {
     console.log('submit')
     if (this.transactionForm.valid) {
@@ -655,15 +639,10 @@ export class TransactionsCRUD implements OnInit {
         accountId: formData.accountId
       };
 
-      console.log('Datos del formulario:', formData);
-      console.log('transactionType valor:', formData.transactionType);
-      console.log('transactionType tipo:', typeof formData.transactionType);
-      console.log('Datos de la transacción:', transactionData);
       try {
         if (this.editMode) {
           this.transactionService.updateTransaction(this.currentTransactionId!, transactionData).subscribe({
             next: (response) => {
-              console.log('Transacción actualizada:', response);
               this.messageService.add({
                 severity: 'success',
                 summary: 'Éxito',
@@ -693,7 +672,6 @@ export class TransactionsCRUD implements OnInit {
           console.log('crar transaccion')
           this.transactionService.createTransaction(transactionData).subscribe({
             next: (response) => {
-              console.log('Transacción creada:', response);
               this.messageService.add({
                 severity: 'success',
                 summary: 'Éxito',
@@ -814,63 +792,33 @@ export class TransactionsCRUD implements OnInit {
 
   // Métodos de paginación
   goToFirstPage() {
-    if (this.paginationData().hasPreviousPage) {
-      this.paginationData.update(data => ({ ...data, currentPage: 1 }));
+    if (this.paginationService.goToFirstPage()) {
       this.loadTransactions();
     }
   }
 
   goToPreviousPage() {
-    if (this.paginationData().hasPreviousPage) {
-      this.paginationData.update(data => ({
-        ...data,
-        currentPage: data.currentPage - 1
-      }));
-      this.transactionSignal.set([])
+    if (this.paginationService.goToPreviousPage()) {
       this.loadTransactions();
     }
   }
 
   goToNextPage() {
-    if (this.paginationData().hasNextPage) {
-      this.paginationData.update(data => ({
-        ...data,
-        currentPage: data.currentPage + 1
-      }));
-      this.transactionSignal.set([])
+    if (this.paginationService.goToNextPage()) {
       this.loadTransactions();
     }
   }
 
   goToLastPage() {
-    if (this.paginationData().hasNextPage) {
-      this.paginationData.update(data => ({
-        ...data,
-        currentPage: data.totalPages
-      }));
+    if (this.paginationService.goToLastPage()) {
       this.loadTransactions();
     }
   }
 
   onRowsPerPageChange(event: any) {
-    this.paginationData.update(data => ({
-      ...data,
-      pageSize: event.value,
-      currentPage: 1
-    }));
+    this.paginationService.changePageSize(event.value);
     this.currentPageSize = event.value;
     this.loadTransactions();
-  }
-
-  getStartRecord(): number {
-    const data = this.paginationData();
-    return data.totalCount === 0 ? 0 : ((data.currentPage - 1) * data.pageSize) + 1;
-  }
-
-  getEndRecord(): number {
-    const data = this.paginationData();
-    const end = data.currentPage * data.pageSize;
-    return Math.min(end, data.totalCount);
   }
 
   // Métodos de utilidad
@@ -898,6 +846,15 @@ export class TransactionsCRUD implements OnInit {
         return 'success';
       default:
         return 'danger';
+    }
+  }
+
+  getTransactionAccountIdSeverity(accountId: string): string {
+    switch (accountId) {
+      case null:
+        return 'secondary';
+      default:
+        return 'success';
     }
   }
 }
