@@ -30,7 +30,7 @@ import { CategoriesService, Category } from '../service/categories.service';
 import { Account, AccountsService } from '../service/accounts.service';
 import { PaginationService } from '../service/pagination.service';
 import { PrimeNG } from 'primeng/config';
-import { FilterService } from 'primeng/api';
+import { PrimengConfigService } from '../service/primengconfig.service';
 
 @Component({
   selector: 'app-transactions-crud',
@@ -143,7 +143,7 @@ import { FilterService } from 'primeng/api';
                 field="amount" 
                 display="menu" 
                 placeholder="Buscar por monto"
-                [matchModeOptions]="numberFilterOptions">
+                [matchModeOptions]="primengConfig.numberFilterOptions">
               </p-columnFilter>
 
                 <p-sortIcon field="amount"></p-sortIcon>
@@ -157,7 +157,7 @@ import { FilterService } from 'primeng/api';
                         field="categoryName" 
                         display="menu" 
                         placeholder="Buscar por categoría"
-                        [matchModeOptions]="textFilterOptions">
+                        [matchModeOptions]="primengConfig.textFilterOptions">
                       </p-columnFilter>
               </div>
             </th>
@@ -168,7 +168,7 @@ import { FilterService } from 'primeng/api';
                   field="date"
                   matchMode="dateIs"
                   display="menu"
-                  [matchModeOptions]="dateFilterOptions">
+                  [matchModeOptions]="primengConfig.dateFilterOptions">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <p-calendar
                       [ngModel]="value"
@@ -193,7 +193,7 @@ import { FilterService } from 'primeng/api';
                       field="description" 
                       display="menu" 
                       placeholder="Buscar por descripción"
-                      [matchModeOptions]="textFilterOptions">
+                      [matchModeOptions]="primengConfig.textFilterOptions">
                     </p-columnFilter>
               </div>
             </th>
@@ -212,7 +212,7 @@ import { FilterService } from 'primeng/api';
                     field="accountId" 
                     display="menu" 
                     placeholder="Buscar por cuenta"
-                    [matchModeOptions]="textFilterOptions">
+                    [matchModeOptions]="primengConfig.textFilterOptions">
                   </p-columnFilter>
                 <p-sortIcon field="accountId"></p-sortIcon>
               </div>
@@ -519,7 +519,7 @@ export class TransactionsCRUD implements OnInit {
   categoriesService = inject(CategoriesService)
   accountService = inject(AccountsService)
   paginationService = inject(PaginationService)
-  primengConfig = inject(PrimeNG)
+  primengConfig = inject(PrimengConfigService)
 
 
   loading: boolean = false;
@@ -571,72 +571,7 @@ export class TransactionsCRUD implements OnInit {
     this.loadTransactions()
     this.loadCategories()
     this.loadAccounts()
-    this.primengConfig.setTranslation({
-      // Filtros generales
-      matchAll: 'Coincidir con todos',
-      matchAny: 'Coincidir con cualquiera',
-      addRule: 'Agregar regla',
-      removeRule: 'Quitar regla',
-      clear: 'Limpiar',
-      apply: 'Aplicar',
-
-      // Operadores de filtro
-      startsWith: 'Empieza por',
-      contains: 'Contiene',
-      notContains: 'No contiene',
-      endsWith: 'Termina por',
-      equals: 'Igual a',
-      notEquals: 'No igual a',
-      noFilter: 'Sin filtro',
-
-      // Para números
-      lt: 'Menor que',
-      lte: 'Menor o igual que',
-      gt: 'Mayor que',
-      gte: 'Mayor o igual que',
-
-      // Para fechas
-      dateIs: 'Es igual a',
-      dateIsNot: 'No es igual a',
-      dateBefore: 'Antes de',
-      dateAfter: 'Después de',
-
-      // Otros
-      choose: 'Elegir',
-      upload: 'Subir',
-      cancel: 'Cancelar',
-      reject: 'Rechazar',
-      accept: 'Aceptar'
-    });
-
-
   }
-
-  // Opciones personalizadas para cada tipo de columna
-  textFilterOptions = [
-    { label: 'Contiene', value: 'contains' },
-    { label: 'No contiene', value: 'notContains' },
-    { label: 'Empieza por', value: 'startsWith' },
-    { label: 'Termina por', value: 'endsWith' },
-    { label: 'Igual a', value: 'equals' },
-    { label: 'No igual a', value: 'notEquals' }
-  ];
-
-  numberFilterOptions = [
-    { label: 'Igual a', value: 'equals' },
-    { label: 'No igual a', value: 'notEquals' },
-    { label: 'Mayor que', value: 'gt' },
-    { label: 'Mayor o igual que', value: 'gte' },
-    { label: 'Menor que', value: 'lt' },
-    { label: 'Menor o igual que', value: 'lte' }
-  ];
-
-  dateFilterOptions = [
-    { label: 'Es igual a', value: 'dateIs' },
-    { label: 'No es igual a', value: 'dateIsNot' },
-    { label: 'Antes de', value: 'dateBefore' },
-    { label: 'Después de', value: 'dateAfter' }
-  ];
 
   initializeForm() {
     this.transactionForm = this.fb.group({
