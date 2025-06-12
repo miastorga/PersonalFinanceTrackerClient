@@ -87,6 +87,19 @@ import { PaginationService } from '../service/pagination.service';
             (onClick)="exportCSV()" />
         </ng-template>
       </p-toolbar>
+          <p-toast
+            position="top-right"
+            [baseZIndex]="5000"
+            [breakpoints]="{'960px': {width: '100%', right: '0', left: '0'}}">
+          </p-toast>
+
+          <!-- BOTÓN DE PRUEBA TEMPORAL PARA EL MESSAGE SERVICE -->
+          <button
+            pButton
+            label="Test Message"
+            class="p-button-secondary mb-2"
+            (click)="testMessage()">
+          </button>
 
       <p-table
         #dt1
@@ -128,11 +141,12 @@ import { PaginationService } from '../service/pagination.service';
                 <p-columnFilter type="text" field="categoryName" display="menu" placeholder="Buscar por categoría"></p-columnFilter>
               </div>
             </th>
-            <th style="min-width: 12rem">
-              <div class="flex justify-between items-center">
+            <th style="min-width: 12rem"  pSortableColumn="monto">
+              <!-- <div class="flex justify-between items-center"> -->
                 Monto
-                <p-columnFilter type="text" field="amount" display="menu" placeholder="Buscar por monto"></p-columnFilter>
-              </div>
+                <!-- <p-columnFilter type="text" field="amount" display="menu" placeholder="Buscar por monto"></p-columnFilter> -->
+                <p-sortIcon field="monto"></p-sortIcon>
+              <!-- </div> -->
             </th>
             <th style="min-width: 12rem">
               <div class="flex justify-between items-center">
@@ -201,7 +215,7 @@ import { PaginationService } from '../service/pagination.service';
               />
             </td> 
             <td>
-              <p-tag [value]="transaction.accountId ?? 'Sin Cuenta'" styleClass="dark:!bg-surface-900 " [severity]="getTransactionAccountIdSeverity(transaction.accountId)"/>
+              <p-tag [value]="getAccountName(transaction) ?? 'Sin Cuenta'" styleClass="dark:!bg-surface-900 " [severity]="getTransactionAccountIdSeverity(transaction.accountId)"/>
             </td>
             <td>
               <p-button 
@@ -355,6 +369,7 @@ import { PaginationService } from '../service/pagination.service';
                 </form>
               </ng-template>
 
+
               <ng-template #footer>
                 <div class="flex justify-end gap-2">
                   <button
@@ -387,40 +402,44 @@ import { PaginationService } from '../service/pagination.service';
         <div class="flex items-center gap-2">
           <!-- Botón Primera Página -->
           <button
-  pButton
-  icon="pi pi-angle-double-left"
-  class="p-button-text p-button-sm"
-  [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
-  (click)="goToFirstPage()"
-  pTooltip="Primera página">
-</button>
+            pButton
+            icon="pi pi-angle-double-left"
+            class="p-button-text p-button-sm"
+            [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
+            (click)="goToFirstPage()"
+            pTooltip="Primera página">
+          </button>
 
-<button
-  pButton
-  icon="pi pi-angle-left"
-  class="p-button-text p-button-sm"
-  [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
-  (click)="goToPreviousPage()"
-  pTooltip="Página anterior">
-</button>
+          <button
+            pButton
+            icon="pi pi-angle-left"
+            class="p-button-text p-button-sm"
+            [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
+            (click)="goToPreviousPage()"
+            pTooltip="Página anterior">
+          </button>
 
-<button
-  pButton
-  icon="pi pi-angle-right"
-  class="p-button-text p-button-sm"
-  [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
-  (click)="goToNextPage()"
-  pTooltip="Página siguiente">
-</button>
+          <span class="text-sm font-medium text-gray-700 px-3">
+                Página {{ paginationService.paginationData().currentPage }} de {{ paginationService.paginationData().totalPages }}
+            </span>
 
-<button
-  pButton
-  icon="pi pi-angle-double-right"
-  class="p-button-text p-button-sm"
-  [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
-  (click)="goToLastPage()"
-  pTooltip="Última página">
-</button>
+          <button
+            pButton
+            icon="pi pi-angle-right"
+            class="p-button-text p-button-sm"
+            [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
+            (click)="goToNextPage()"
+            pTooltip="Página siguiente">
+          </button>
+
+          <button
+            pButton
+            icon="pi pi-angle-double-right"
+            class="p-button-text p-button-sm"
+            [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
+            (click)="goToLastPage()"
+            pTooltip="Última página">
+          </button>
         </div>
         <div class="flex items-center gap-2">
           <label class="text-sm">Filas por página:</label>
@@ -434,9 +453,6 @@ import { PaginationService } from '../service/pagination.service';
         </div>
       </div>
     </div>
-
- 
-
     <p-confirmdialog [style]="{ width: '450px' }" />
   `,
   styles: `
@@ -498,14 +514,6 @@ export class TransactionsCRUD implements OnInit {
   savingTransaction = false;
   selectedTransactions!: Transaction[] | null;
 
-  // Opciones para dropdowns
-  // rowsPerPageOptions = [
-  //   { label: '5', value: 5 },
-  //   { label: '10', value: 10 },
-  //   { label: '25', value: 25 },
-  //   { label: '50', value: 50 }
-  // ];
-
   transactionTypes = [
     { label: 'Ingreso', value: 'ingreso' },
     { label: 'Gasto', value: 'gasto' },
@@ -523,6 +531,17 @@ export class TransactionsCRUD implements OnInit {
     this.loadTransactions()
     this.loadCategories()
     this.loadAccounts()
+    this.testMessage()
+  }
+
+  testMessage() {
+    console.log('Testing message service...');
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Test',
+      detail: 'Este es un mensaje de prueba'
+    });
+    console.log('Message added to service');
   }
 
   initializeForm() {
@@ -541,6 +560,10 @@ export class TransactionsCRUD implements OnInit {
     this.paginationService.loadData((page, pageSize) =>
       this.transactionService.getTransactions({ page, results: pageSize })
     );
+  }
+
+  getAccountName(transaction: Transaction) {
+    return this.accountsSignal().find(a => a.accountId == transaction.accountId)?.accountName
   }
 
   loadCategories() {
@@ -630,18 +653,20 @@ export class TransactionsCRUD implements OnInit {
       this.savingTransaction = true;
 
       const formData = this.transactionForm.value;
+      console.log(formData)
       const transactionData: CreateTransaction = {
         amount: formData.amount,
         description: formData.description,
         date: formData.date.toISOString(),
         transactionType: formData.transactionType,
-        categoryId: "96fea329-d2d2-4f8c-8c57-59159b9f5b00",
+        categoryId: formData.categoryName,// Es realmente el ID
         accountId: formData.accountId
       };
 
       try {
         if (this.editMode) {
           this.transactionService.updateTransaction(this.currentTransactionId!, transactionData).subscribe({
+            // Hacer que el message funcione
             next: (response) => {
               this.messageService.add({
                 severity: 'success',
@@ -662,14 +687,7 @@ export class TransactionsCRUD implements OnInit {
               this.savingTransaction = false;
             }
           })
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Transacción actualizada exitosamente'
-          });
         } else {
-
-          console.log('crar transaccion')
           this.transactionService.createTransaction(transactionData).subscribe({
             next: (response) => {
               this.messageService.add({
@@ -677,8 +695,10 @@ export class TransactionsCRUD implements OnInit {
                 summary: 'Éxito',
                 detail: 'Transacción creada exitosamente'
               });
-              this.hideAddTransactionDialog();
-              this.loadTransactions();
+              setTimeout(() => {
+                this.hideAddTransactionDialog();
+                this.loadTransactions();
+              }, 1000);
               this.savingTransaction = false;
             },
             error: (error) => {

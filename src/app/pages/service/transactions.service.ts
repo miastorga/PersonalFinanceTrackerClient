@@ -160,7 +160,7 @@ export class TransactionsService {
       }
     }
 
-    console.error('Error en TransactionsService:', error);
+    console.error('Error en TransactionsService:', error.error);
     return throwError(() => new Error(errorMessage));
   }
 }
