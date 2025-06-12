@@ -24,11 +24,13 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { SliderModule } from 'primeng/slider';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ToggleButtonModule } from 'primeng/togglebutton';
-import { CreateTransaction, QueryParametersTransaction, Transaction, TransactionResponse, TransactionsService } from '../service/transactions.service';
+import { CreateTransaction, Transaction, TransactionResponse, TransactionsService } from '../service/transactions.service';
 import { forkJoin } from 'rxjs';
 import { CategoriesService, Category } from '../service/categories.service';
 import { Account, AccountsService } from '../service/accounts.service';
 import { PaginationService } from '../service/pagination.service';
+import { PrimeNG } from 'primeng/config';
+import { FilterService } from 'primeng/api';
 
 @Component({
   selector: 'app-transactions-crud',
@@ -92,15 +94,6 @@ import { PaginationService } from '../service/pagination.service';
             [baseZIndex]="5000"
             [breakpoints]="{'960px': {width: '100%', right: '0', left: '0'}}">
           </p-toast>
-
-          <!-- BOTÓN DE PRUEBA TEMPORAL PARA EL MESSAGE SERVICE -->
-          <button
-            pButton
-            label="Test Message"
-            class="p-button-secondary mb-2"
-            (click)="testMessage()">
-          </button>
-
       <p-table
         #dt1
         [value]="paginationService.items()"
@@ -114,6 +107,8 @@ import { PaginationService } from '../service/pagination.service';
         responsiveLayout="scroll"
         [(selection)]="selectedTransactions"
         [tableStyle]="{ 'min-width': '75rem' }"
+        [sortField]="'monto'"
+        [sortOrder]="1"
       >
         <ng-template #caption>
           <div class="flex justify-between items-center flex-column sm:flex-row">
@@ -135,47 +130,91 @@ import { PaginationService } from '../service/pagination.service';
             <th style="width: 3rem">
               <p-tableHeaderCheckbox />
             </th>
-            <th style="min-width: 12rem">
+            <th style="min-width: 12rem" >
               <div class="flex justify-between items-center">
                 Id
-                <p-columnFilter type="text" field="categoryName" display="menu" placeholder="Buscar por categoría"></p-columnFilter>
               </div>
             </th>
-            <th style="min-width: 12rem"  pSortableColumn="monto">
-              <!-- <div class="flex justify-between items-center"> -->
+            <th style="min-width: 12rem" pSortableColumn="amount">
+              <div class="flex justify-between items-center">
                 Monto
-                <!-- <p-columnFilter type="text" field="amount" display="menu" placeholder="Buscar por monto"></p-columnFilter> -->
-                <p-sortIcon field="monto"></p-sortIcon>
-              <!-- </div> -->
+              <p-columnFilter 
+                type="numeric" 
+                field="amount" 
+                display="menu" 
+                placeholder="Buscar por monto"
+                [matchModeOptions]="numberFilterOptions">
+              </p-columnFilter>
+
+                <p-sortIcon field="amount"></p-sortIcon>
+              </div>
             </th>
             <th style="min-width: 12rem">
               <div class="flex justify-between items-center">
                 Categoría
-                <p-columnFilter type="text" field="categoryName" display="menu" placeholder="Buscar por categoría"></p-columnFilter>
+                <p-columnFilter 
+                        type="text" 
+                        field="categoryName" 
+                        display="menu" 
+                        placeholder="Buscar por categoría"
+                        [matchModeOptions]="textFilterOptions">
+                      </p-columnFilter>
               </div>
             </th>
-            <th style="min-width: 14rem">
+            <th style="min-width: 14rem" pSortableColumn="date">
               <div class="flex justify-between items-center">
                 Fecha
-                <p-columnFilter type="date" field="date" display="menu" placeholder="dd/mm/yyyy"></p-columnFilter>
+                <p-columnFilter
+                  field="date"
+                  matchMode="dateIs"
+                  display="menu"
+                  [matchModeOptions]="dateFilterOptions">
+                  <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                    <p-calendar
+                      [ngModel]="value"
+                      (onSelect)="filter($event)"
+                      (onClearClick)="filter(null)"
+                      placeholder="Seleccionar fecha"
+                      [showIcon]="true"
+                      [showClear]="false"
+                      dateFormat="dd/mm/yy"
+                      [readonlyInput]="true">
+                    </p-calendar>
+                  </ng-template>
+                </p-columnFilter>
+                <p-sortIcon field="date"></p-sortIcon>
               </div>
             </th>
-            <th style="min-width: 10rem">
+            <th style="min-width: 10rem" >
               <div class="flex justify-between items-center">
                 Descripción
-                <p-columnFilter type="text" field="description" display="menu" placeholder="Buscar por descripción"></p-columnFilter>
+                <p-columnFilter 
+                      type="text" 
+                      field="description" 
+                      display="menu" 
+                      placeholder="Buscar por descripción"
+                      [matchModeOptions]="textFilterOptions">
+                    </p-columnFilter>
               </div>
             </th>
-            <th style="min-width: 10rem">
+            <th style="min-width: 10rem" pSortableColumn="transactionType">
               <div class="flex justify-between items-center">
                 Tipo
-                <p-columnFilter type="text" field="transactionType" display="menu" placeholder="Buscar por tipo"></p-columnFilter>
+                <!-- <p-columnFilter type="text" field="transactionType" display="menu" placeholder="Buscar por tipo"></p-columnFilter> -->
+                <p-sortIcon field="transactionType"></p-sortIcon>
               </div>
             </th>
-            <th style="min-width: 12rem">
+            <th style="min-width: 12rem" pSortableColumn="accountId">
               <div class="flex justify-between items-center">
                 Cuenta
-                <p-columnFilter type="text" field="accountId" display="menu" placeholder="Buscar por cuenta"></p-columnFilter>
+                <p-columnFilter 
+                    type="text" 
+                    field="accountId" 
+                    display="menu" 
+                    placeholder="Buscar por cuenta"
+                    [matchModeOptions]="textFilterOptions">
+                  </p-columnFilter>
+                <p-sortIcon field="accountId"></p-sortIcon>
               </div>
             </th>
             <th style="min-width: 12rem">Acciones</th>
@@ -193,8 +232,8 @@ import { PaginationService } from '../service/pagination.service';
               </div>
             </td>
             <td>
-              {{ transaction.amount | currency:'USD':'symbol':'1.2-2' }}
-            </td>
+            {{ transaction.amount | currency:'USD':'symbol':'1.0-0' }}
+                      </td>
             <td>
               <div class="flex items-center gap-2">
                 <span>{{ transaction.categoryName }}</span>
@@ -480,6 +519,8 @@ export class TransactionsCRUD implements OnInit {
   categoriesService = inject(CategoriesService)
   accountService = inject(AccountsService)
   paginationService = inject(PaginationService)
+  primengConfig = inject(PrimeNG)
+
 
   loading: boolean = false;
   editMode: boolean = false;
@@ -489,7 +530,6 @@ export class TransactionsCRUD implements OnInit {
   @ViewChild('dt1') dt1!: Table;
 
   // Signals para transacciones y paginación
-  transactionSignal = signal<Transaction[]>([]);
   categoriesSignal = signal<Category[]>([])
   accountsSignal = signal<Account[]>([])
   paginationData = signal<{
@@ -531,18 +571,72 @@ export class TransactionsCRUD implements OnInit {
     this.loadTransactions()
     this.loadCategories()
     this.loadAccounts()
-    this.testMessage()
+    this.primengConfig.setTranslation({
+      // Filtros generales
+      matchAll: 'Coincidir con todos',
+      matchAny: 'Coincidir con cualquiera',
+      addRule: 'Agregar regla',
+      removeRule: 'Quitar regla',
+      clear: 'Limpiar',
+      apply: 'Aplicar',
+
+      // Operadores de filtro
+      startsWith: 'Empieza por',
+      contains: 'Contiene',
+      notContains: 'No contiene',
+      endsWith: 'Termina por',
+      equals: 'Igual a',
+      notEquals: 'No igual a',
+      noFilter: 'Sin filtro',
+
+      // Para números
+      lt: 'Menor que',
+      lte: 'Menor o igual que',
+      gt: 'Mayor que',
+      gte: 'Mayor o igual que',
+
+      // Para fechas
+      dateIs: 'Es igual a',
+      dateIsNot: 'No es igual a',
+      dateBefore: 'Antes de',
+      dateAfter: 'Después de',
+
+      // Otros
+      choose: 'Elegir',
+      upload: 'Subir',
+      cancel: 'Cancelar',
+      reject: 'Rechazar',
+      accept: 'Aceptar'
+    });
+
+
   }
 
-  testMessage() {
-    console.log('Testing message service...');
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Test',
-      detail: 'Este es un mensaje de prueba'
-    });
-    console.log('Message added to service');
-  }
+  // Opciones personalizadas para cada tipo de columna
+  textFilterOptions = [
+    { label: 'Contiene', value: 'contains' },
+    { label: 'No contiene', value: 'notContains' },
+    { label: 'Empieza por', value: 'startsWith' },
+    { label: 'Termina por', value: 'endsWith' },
+    { label: 'Igual a', value: 'equals' },
+    { label: 'No igual a', value: 'notEquals' }
+  ];
+
+  numberFilterOptions = [
+    { label: 'Igual a', value: 'equals' },
+    { label: 'No igual a', value: 'notEquals' },
+    { label: 'Mayor que', value: 'gt' },
+    { label: 'Mayor o igual que', value: 'gte' },
+    { label: 'Menor que', value: 'lt' },
+    { label: 'Menor o igual que', value: 'lte' }
+  ];
+
+  dateFilterOptions = [
+    { label: 'Es igual a', value: 'dateIs' },
+    { label: 'No es igual a', value: 'dateIsNot' },
+    { label: 'Antes de', value: 'dateBefore' },
+    { label: 'Después de', value: 'dateAfter' }
+  ];
 
   initializeForm() {
     this.transactionForm = this.fb.group({
@@ -666,7 +760,6 @@ export class TransactionsCRUD implements OnInit {
       try {
         if (this.editMode) {
           this.transactionService.updateTransaction(this.currentTransactionId!, transactionData).subscribe({
-            // Hacer que el message funcione
             next: (response) => {
               this.messageService.add({
                 severity: 'success',
@@ -682,7 +775,7 @@ export class TransactionsCRUD implements OnInit {
               this.messageService.add({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Error al actualizar la transacción'
+                detail: `Error al actualizar la transacción ${error.message}`
               });
               this.savingTransaction = false;
             }
@@ -706,7 +799,7 @@ export class TransactionsCRUD implements OnInit {
               this.messageService.add({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Error al crear la transacción'
+                detail: `Error al crear la transacción ${error.message}`
               });
               this.savingTransaction = false;
             }
@@ -760,7 +853,7 @@ export class TransactionsCRUD implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: 'Error al eliminar la transacción'
+              detail: `Error al eliminar la transacción ${error.message}`
             });
             this.savingTransaction = false;
           }
@@ -799,7 +892,7 @@ export class TransactionsCRUD implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: 'Error al eliminar algunas transacciones'
+              detail: `Error al eliminar algunas transacciones ${error.message}`
             });
             this.selectedTransactions = [];
             this.loadTransactions();

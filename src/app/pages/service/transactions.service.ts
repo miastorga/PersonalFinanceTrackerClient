@@ -139,7 +139,7 @@ export class TransactionsService {
 
     if (error.error instanceof ErrorEvent) {
       // Error del lado del cliente
-      errorMessage = `Error: ${error.error.message}`;
+      errorMessage = `${error.error.message}`;
     } else {
       // Error del lado del servidor
       switch (error.status) {

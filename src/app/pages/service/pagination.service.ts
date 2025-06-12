@@ -61,12 +61,16 @@ export class PaginationService<T> {
       currentPage: 1
     }));
   }
-
   /**
    * Actualiza los datos de paginación desde una respuesta del servidor
    */
   updateFromResponse(response: PaginationResponse<T>) {
-    this._items.set(response.items);
+    const transformedItems = response.items.map((item: any) => ({
+      ...item,
+      date: typeof item.date === 'string' && item.date ? new Date(item.date) : item.date
+    }));
+
+    this._items.set(transformedItems);
     this._paginationData.set({
       totalCount: response.totalCount,
       pageSize: response.pageSize,

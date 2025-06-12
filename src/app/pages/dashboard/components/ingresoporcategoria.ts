@@ -22,7 +22,7 @@ import { SummaryResponse, TransactionsService } from '../../service/transactions
     <ng-template #body let-expense>
       <tr>
         <td style="width: 35%; min-width: 7rem;">{{ expense.name }}</td>
-        <td style="width: 35%; min-width: 8rem;">{{ expense.price  }}</td>
+        <td style="width: 35%; min-width: 8rem;">{{ expense.price | currency:'USD':'symbol':'1.0-0'  }}</td>
         <td style="width: 15%;">{{ expense.percentage }}%</td>
       </tr>
     </ng-template>

@@ -23,7 +23,7 @@ import { Transaction, TransactionsService } from '../../service/transactions.ser
     </ng-template>
     <ng-template #body let-transaccion>
       <tr>
-        <td style="width: 35%; min-width: 7rem;">{{ transaccion.amount }}</td>
+        <td style="width: 35%; min-width: 7rem;">{{ transaccion.amount | currency:'USD':'symbol':'1.0-0' }}</td>
         <td style="width: 35%; min-width: 8rem;">{{ transaccion.categoryName  }}</td>
         <td style="width: 15%;">{{ transaccion.date | date:'dd-MM-yyyy'}}</td>
         <td style="width: 15%;">{{ transaccion.description }}</td>

@@ -11,7 +11,7 @@ import { QueryParametersSummary, SummaryResponse, TransactionsService } from '..
                 <div class="flex justify-between mb-4">
                     <div>
                         <span class="block text-muted-color font-medium mb-4">Ingresos</span>
-                        <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">&#36;{{summary().totalIncome}}</div>
+                        <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">{{summary().totalIncome | currency:'USD':'symbol':'1.0-0'}}</div>
                     </div>
                     <div class="flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-shopping-cart text-blue-500 !text-xl"></i>
@@ -25,7 +25,7 @@ import { QueryParametersSummary, SummaryResponse, TransactionsService } from '..
                 <div class="flex justify-between mb-4">
                     <div>
                         <span class="block text-muted-color font-medium mb-4">Gastos</span>
-                        <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">&#36;{{summary().totalExpenses}}</div>
+                        <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">{{summary().totalExpenses | currency:'USD':'symbol':'1.0-0'}}</div>
                     </div>
                     <div class="flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-dollar text-orange-500 !text-xl"></i>
@@ -39,7 +39,7 @@ import { QueryParametersSummary, SummaryResponse, TransactionsService } from '..
                 <div class="flex justify-between mb-4">
                     <div>
                         <span class="block text-muted-color font-medium mb-4">Balance</span>
-                        <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">&#36;{{summary().balance}}</div>
+                        <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">{{summary().balance | currency:'USD':'symbol':'1.0-0' }}</div>
                     </div>
                     <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-users text-cyan-500 !text-xl"></i>
