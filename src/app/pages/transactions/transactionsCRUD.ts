@@ -29,7 +29,6 @@ import { forkJoin } from 'rxjs';
 import { CategoriesService, Category } from '../service/categories.service';
 import { Account, AccountsService } from '../service/accounts.service';
 import { PaginationService } from '../service/pagination.service';
-import { PrimeNG } from 'primeng/config';
 import { PrimengConfigService } from '../service/primengconfig.service';
 
 @Component({
@@ -81,13 +80,13 @@ import { PrimengConfigService } from '../service/primengconfig.service';
             [disabled]="!selectedTransactions || selectedTransactions.length === 0" />
         </ng-template>
 
-        <ng-template #end>
+        <!-- <ng-template #end>
           <p-button 
             label="Exportar" 
             icon="pi pi-upload" 
             severity="secondary" 
             (onClick)="exportCSV()" />
-        </ng-template>
+        </ng-template> -->
       </p-toolbar>
           <p-toast
             position="top-right"
