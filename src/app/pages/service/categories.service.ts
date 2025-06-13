@@ -41,25 +41,13 @@ export interface Category {
   categoryName: string
 }
 
-export interface CreateTransaction {
-  amount: number;
-  transactionType: "gasto" | "ingreso";
-  categoryId: string;
-  date: string;
-  description: string;
-  accountId: string | null;
+export interface CreateCategory {
+  categoryName: string
 }
 
-export interface CreateTransactionResponse {
-  transactionId: string
-  amount: number;
-  transactionType: "gasto" | "ingreso";
-  categoryId: string;
-  categoryName: string;
-  date: string;
-  description: string;
-  accountId: string | null;
-  accountName: string | null;
+export interface CreateCategoryResponse {
+  categoryId: string
+  categoryName: string
 }
 
 // export interface CategoryResponse {
@@ -80,23 +68,28 @@ export class CategoriesService {
     )
   }
 
-  createTransaction(params: CreateTransaction) {
-    console.log(params)
-    return this.http.post<CreateTransactionResponse>(this.URL, params).pipe(
+  createCategory(params: CreateCategory) {
+    return this.http.post<CreateCategoryResponse>(this.URL, { name: params["categoryName"] }).pipe(
       catchError(this.handleError)
     )
   }
 
   removeTransaction(id: string) {
+    console.log(id)
     return this.http.delete<void>(`${this.URL}/${id}`).pipe(
       catchError(this.handleError)
     )
   }
 
-  updateTransaction(id: string, params: CreateTransaction) {
-    console.log(id)
-    console.log(params)
-    return this.http.put<CreateTransaction>(`${this.URL}/${id}`, params).pipe(
+  updateCategory(id: string, params: CreateCategory) {
+
+    return this.http.put<CreateCategory>(`${this.URL}/${id}`, { name: params["categoryName"] }).pipe(
+      catchError(this.handleError)
+    )
+  }
+
+  removeCategory(id: string) {
+    return this.http.delete<void>(`${this.URL}/${id}`).pipe(
       catchError(this.handleError)
     )
   }

@@ -517,7 +517,7 @@ export class TransactionsCRUD implements OnInit {
   confirmationService = inject(ConfirmationService);
   categoriesService = inject(CategoriesService)
   accountService = inject(AccountsService)
-  paginationService = inject(PaginationService)
+  paginationService = inject<PaginationService<Transaction>>(PaginationService)
   primengConfig = inject(PrimengConfigService)
 
 
@@ -558,7 +558,7 @@ export class TransactionsCRUD implements OnInit {
     { label: 'Gasto', value: 'gasto' },
   ];
 
-  currentPageSize = 5;
+  currentPageSize = 10;
 
   constructor() {
     this.initializeForm();
@@ -566,7 +566,7 @@ export class TransactionsCRUD implements OnInit {
 
   ngOnInit() {
     console.log('TRANSACTIONS CRUD INIT');
-    this.paginationService.initialize(5);
+    this.paginationService.initialize(10);
     this.loadTransactions()
     this.loadCategories()
     this.loadAccounts()
@@ -588,6 +588,7 @@ export class TransactionsCRUD implements OnInit {
     this.paginationService.loadData((page, pageSize) =>
       this.transactionService.getTransactions({ page, results: pageSize })
     );
+    console.log('trans ' + this.paginationService.items())
   }
 
   getAccountName(transaction: Transaction) {
@@ -640,12 +641,14 @@ export class TransactionsCRUD implements OnInit {
     this.currentTransactionId = transaction.transactionId || null;
     this.displayAddTransactionDialog = true;
 
+    console.log(transaction)
+
     this.transactionForm.patchValue({
       amount: transaction.amount,
       description: transaction.description,
       date: new Date(transaction.date),
       transactionType: transaction.transactionType,
-      categoryName: transaction.categoryName,
+      categoryName: transaction.categoryId,
       accountId: transaction.accountId
     });
   }
@@ -693,15 +696,16 @@ export class TransactionsCRUD implements OnInit {
 
       try {
         if (this.editMode) {
+          console.log('editar')
           this.transactionService.updateTransaction(this.currentTransactionId!, transactionData).subscribe({
             next: (response) => {
+              this.loadTransactions();
               this.messageService.add({
                 severity: 'success',
                 summary: 'Éxito',
-                detail: 'Transacción creada exitosamente'
+                detail: 'Transacción actualizada exitosamente'
               });
               this.hideAddTransactionDialog();
-              this.loadTransactions();
               this.savingTransaction = false;
             },
             error: (error) => {
@@ -717,15 +721,13 @@ export class TransactionsCRUD implements OnInit {
         } else {
           this.transactionService.createTransaction(transactionData).subscribe({
             next: (response) => {
+              this.loadTransactions();
               this.messageService.add({
                 severity: 'success',
                 summary: 'Éxito',
                 detail: 'Transacción creada exitosamente'
               });
-              setTimeout(() => {
-                this.hideAddTransactionDialog();
-                this.loadTransactions();
-              }, 1000);
+              this.hideAddTransactionDialog();
               this.savingTransaction = false;
             },
             error: (error) => {

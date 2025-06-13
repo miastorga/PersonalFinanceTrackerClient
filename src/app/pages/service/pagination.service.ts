@@ -43,9 +43,9 @@ export class PaginationService<T> {
 
   // Opciones de filas por página
   readonly rowsPerPageOptions = [
-    { label: '5', value: 5 },
     { label: '10', value: 10 },
     { label: '25', value: 25 },
+    { label: '35', value: 35 },
     { label: '50', value: 50 }
   ];
 
