@@ -1,15 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { StyleClassModule } from 'primeng/styleclass';
-import { AppConfigurator } from './app.configurator';
+// import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
+import { Menu, MenuModule } from 'primeng/menu';
+import { StyleClass } from 'primeng/styleclass';
+import { Button } from 'primeng/button';
+import { Ripple } from 'primeng/ripple';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator],
+  imports: [RouterModule, CommonModule, StyleClass, Menu, Button, Ripple],
   template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -42,7 +45,7 @@ import { LayoutService } from '../service/layout.service';
                 <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
                 </button>
-                <div class="relative">
+                <!-- <div class="relative">
                     <button
                         class="layout-topbar-action layout-topbar-action-highlight"
                         pStyleClass="@next"
@@ -55,36 +58,109 @@ import { LayoutService } from '../service/layout.service';
                         <i class="pi pi-palette"></i>
                     </button>
                     <app-configurator />
-                </div>
+                </div> -->
             </div>
 
-            <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
+            <!-- <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
                 <i class="pi pi-ellipsis-v"></i>
-            </button>
+            </button> -->
 
-            <div class="layout-topbar-menu hidden lg:block">
-                <div class="layout-topbar-menu-content">
-                    <!-- <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button> -->
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
-                </div>
+            <div class="layout-topbar-menu-content">
+              <div class="relative">
+                <button
+                  type="button"
+                  class="layout-topbar-action"
+                  (click)="showProfileMenu($event)"
+                  pButton
+                  >
+                  <i class="pi pi-user"></i>
+                  <span>Perfil</span>
+                </button>
+                <!-- Menú desplegable -->
+                <p-menu
+                  #profileMenu
+                  [model]="profileMenuItems"
+                  [popup]="true"
+                  [appendTo]="'body'">
+                </p-menu>
+              </div>
             </div>
         </div>
-    </div>`
+    </div>`,
+  styles: [
+    `
+    .relative {
+      position: relative;
+    }
+    
+    :host ::ng-deep .p-menu {
+      z-index: 9999 !important;
+      position: absolute !important;
+    }
+    
+    :host ::ng-deep .p-menu .p-menu-list {
+      min-width: 150px;
+    }
+    `
+  ]
 })
 export class AppTopbar {
-  items!: MenuItem[];
+  @ViewChild('profileMenu') profileMenu!: Menu;
+  profileMenuItems: MenuItem[];
 
-  constructor(public layoutService: LayoutService) { }
+  constructor(private router: Router, public layoutService: LayoutService) {
+    this.profileMenuItems = [
+      // {
+      //   label: 'Cerrar Sesion',
+      //   icon: 'pi pi-user',
+      //   command: () => {
+      //     this.router.navigate(['/profile']);
+      //   }
+      // },
+      {
+        label: 'Configuración',
+        icon: 'pi pi-cog',
+        command: () => {
+          this.router.navigate(['/settings']);
+        }
+      },
+      {
+        separator: true
+      },
+      {
+        label: 'Cerrar Sesión',
+        icon: 'pi pi-sign-out',
+        command: () => {
+          this.logout();
+        }
+      }
+    ];
+  }
+
+  test() {
+    console.log('gola')
+  }
+  showProfileMenu(event: Event) {
+    console.log('showProfileMenu called');
+    console.log('profileMenu:', this.profileMenu);
+
+    if (this.profileMenu) {
+      this.profileMenu.toggle(event);
+      console.log('Menu toggled');
+    } else {
+      console.error('profileMenu is undefined');
+    }
+  }
+
+  logout() {
+    console.log('log out')
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('redirectUrl');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('tokenExpiration');
+    localStorage.removeItem('tokenType');
+    this.router.navigate(['/login']);
+  }
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));

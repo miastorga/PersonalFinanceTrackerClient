@@ -25,11 +25,6 @@ export class AppMenu {
         items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
       },
       {
-        label: 'Login',
-        icon: 'pi pi-fw pi-sign-in',
-        routerLink: ['/login']
-      },
-      {
         label: 'Finanzas', items: [
           { label: 'Transacciones', icon: 'pi pi-fw pi-arrow-right-arrow-left', routerLink: ['/pages/transacciones'] },
           { label: 'Categorias', icon: 'pi pi-fw pi-tags', routerLink: ['/pages/categorias'] },
@@ -41,20 +36,20 @@ export class AppMenu {
         icon: 'pi pi-fw pi-briefcase',
         routerLink: ['/pages'],
         items: [
-          {
-            label: 'Landing',
-            icon: 'pi pi-fw pi-globe',
-            routerLink: ['/landing']
-          },
+          // {
+          //   label: 'Landing',
+          //   icon: 'pi pi-fw pi-globe',
+          //   routerLink: ['/landing']
+          // },
           {
             label: 'Auth',
             icon: 'pi pi-fw pi-user',
             items: [
-              {
-                label: 'Login',
-                icon: 'pi pi-fw pi-sign-in',
-                routerLink: ['/auth/login']
-              },
+              // {
+              //   label: 'Login',
+              //   icon: 'pi pi-fw pi-sign-in',
+              //   routerLink: ['/auth/login']
+              // },
               {
                 label: 'Error',
                 icon: 'pi pi-fw pi-times-circle',

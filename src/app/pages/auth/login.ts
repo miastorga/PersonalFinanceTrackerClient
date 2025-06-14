@@ -10,11 +10,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, ReactiveFormsModule, RippleModule, AppFloatingConfigurator],
+  providers: [MessageService],
+  imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, ReactiveFormsModule, RippleModule, AppFloatingConfigurator, ToastModule],
   template: `
         <app-floating-configurator />
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
@@ -43,31 +46,32 @@ import { AuthService } from '../service/auth.service';
                             <button type="button"  class="text-muted-color font-medium">Sign in to continue</button>
                         </div>
 
-                        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-                            <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Correo</label>
-                            <input pInputText id="email1" type="email" placeholder="correo@gmail.com" class="w-full md:w-[30rem] mb-8" formControlName="email" />
-                            <div *ngIf="isFieldInvalid('email')" class="error-messages">
-                              <small *ngIf="loginForm.get('email')?.errors?.['required']">
-                                El email es requerido
-                              </small>
-                              <small *ngIf="loginForm.get('email')?.errors?.['email']">
-                                Formato de email inválido
-                              </small>
-                            </div>
+                        <p-toast
+                          position="top-right"
+                          [baseZIndex]="5000"
+                          [breakpoints]="{'960px': {width: '100%', right: '0', left: '0'}}">
+                        </p-toast>
+         
 
-                            <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <p-password id="password" type="password" placeholder="***********" formControlName="password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
-                            @if(isFieldInvalid('password')){
-                              @if (loginForm.get('password')?.errors?.['required']) {
-                                <small class="error.messages">
-                                  La contraseña es requerida
-                                </small>
+                        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                          <!-- Campo Email -->
+                          <div class="field mb-6">
+                            <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Correo</label>
+                            <input pInputText id="email1" type="email" placeholder="correo@gmail.com" class="w-full md:w-[30rem] mb-2" formControlName="email" />
+                            <div class="error-container min-h-[20px]">
+                              @if(isFieldInvalid('email')){
+                                @if(loginForm.get('email')?.errors?.['required']){
+                                  <small class="error-messages block text-red-500">El correo es requerido</small>
+                                }
+                                @if(loginForm.get('email')?.errors?.['email']){
+                                  <small class="error-messages block text-red-500">
+                                    Formato de correo inválido
+                                  </small>
+                                }
                               }
-                              @if(loginForm.get('password')?.errors?.['minlength']){
-                                <small class="error.messages">La contraseña debe tener al menos 6 caracteres</small>
-                              }
-                            }
-                            <!-- <div *ngIf="isFieldInvalid('password')" class="error-messages">
+                            </div>
+                          </div>
+                   <!-- <div *ngIf="isFieldInvalid('password')" class="error-messages">
                               <small *ngIf="loginForm.get('password')?.errors?.['required']">
                                 La contraseña es requerida
                               </small>
@@ -75,15 +79,42 @@ import { AuthService } from '../service/auth.service';
                                 La contraseña debe tener al menos 6 caracteres
                               </small>
                             </div> -->
-
-                            <div class="flex items-center justify-between mt-2 mb-8 gap-8">
-                                <div class="flex items-center">
-                                    <!-- <p-checkbox [(ngModel)]="checked" id="rememberme1" binary class="mr-2"></p-checkbox> -->
-                                    <label for="rememberme1">Remember me</label>
-                                </div>
-                                <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
+                          <!-- Campo Password -->
+                          <div class="field mb-6">
+                            <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+                            <p-password id="password" type="password" placeholder="***********" formControlName="password" [toggleMask]="true" styleClass="mb-2" [fluid]="true" [feedback]="false"></p-password>
+                            <div class="error-container min-h-[20px]">
+                              @if(isFieldInvalid('password')){
+                                @if (loginForm.get('password')?.errors?.['required']) {
+                                  <small class="error-messages block text-red-500">
+                                    La contraseña es requerida
+                                  </small>
+                                }
+                                @if(loginForm.get('password')?.errors?.['minlength']){
+                                  <small class="error-messages block text-red-500">
+                                    La contraseña debe tener al menos 6 caracteres
+                                  </small>
+                                }
+                              }
                             </div>
-                            <p-button type="submit" (onClick)="onSubmit()" label="Sign In" styleClass="w-full" type="button" [disabled]="loginForm.invalid || loading" ></p-button>
+                          </div>
+
+                          <!-- Opciones adicionales -->
+                          <div class="flex items-center justify-between mt-2 mb-8 gap-8">
+                            <div class="flex items-center">
+                              <p-checkbox  formControlName="rememberMe"  binary (onChange)="onRememberMeChange($event)" id="rememberme1" binary class="mr-2"></p-checkbox>
+                              <label for="rememberme1">Remember me</label>
+                            </div>
+                            <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
+                          </div>
+
+                          <!-- Botón Submit -->
+                          <p-button
+                            type="submit"
+                            label="Sign In"
+                            styleClass="w-full"
+                            [disabled]="loginForm.invalid || loading">
+                          </p-button>
                         </form>
                     </div>
                 </div>
@@ -95,14 +126,41 @@ export class Login implements OnInit {
   loginForm!: FormGroup;
   loading = false;
   error = '';
-
+  checked = false;
   fb = inject(FormBuilder)
   authService = inject(AuthService)
   router = inject(Router)
+  messageService = inject(MessageService);
 
   ngOnInit(): void {
-    this.initializeForm();
+    this.initializeForm()
+    this.loadRememberMeState();
+    this.loadSavedCredentials();
   }
+
+  private loadRememberMeState(): void {
+    const savedState = localStorage.getItem('rememberMe');
+    const rememberMe = savedState === 'true';
+    this.checked = rememberMe;
+
+    if (this.loginForm) {
+      this.loginForm.patchValue({ rememberMe });
+    }
+  }
+
+  onRememberMeChange(event: any): void {
+    const rememberMe = event.checked;
+    console.log('Remember me:', rememberMe);
+    this.checked = rememberMe;
+
+    localStorage.setItem('rememberMe', rememberMe.toString());
+
+    if (!rememberMe) {
+      localStorage.removeItem('savedEmail');
+      localStorage.removeItem('savedPassword');
+    }
+  }
+
 
   private initializeForm(): void {
     this.loginForm = this.fb.group({
@@ -113,53 +171,66 @@ export class Login implements OnInit {
       password: ['Hola123$', [
         Validators.required,
         Validators.minLength(6)
-      ]]
+      ]],
+      rememberMe: [false]
     });
   }
-  // Getter para fácil acceso a los controles
-  get f(): { [key: string]: AbstractControl } {
-    return this.loginForm.controls;
-  }
 
-  // Método para verificar si un campo es inválido
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  // Método para obtener errores de un campo específico
   getFieldError(fieldName: string, errorType: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field?.errors?.[errorType] && (field.dirty || field.touched));
   }
 
+  loadSavedCredentials(): void {
+    const rememberMe = this.loginForm.get('rememberMe')?.value;
+
+    if (rememberMe) {
+      const savedEmail = localStorage.getItem('savedEmail');
+      const savedPassword = localStorage.getItem('savedPassword');
+
+      if (savedEmail && savedPassword) {
+        this.loginForm.patchValue({
+          email: savedEmail,
+          password: savedPassword
+        });
+      }
+    }
+  }
+
   onSubmit(): void {
     console.log(this.loginForm.value)
     if (this.loginForm.invalid) {
-      // Marcar todos los campos como touched para mostrar errores
       this.markFormGroupTouched();
       return;
     }
-
     this.loading = true;
-    this.error = '';
-
     const loginData = this.loginForm.value;
 
     this.authService.login(loginData).subscribe({
       next: (success) => {
         this.loading = false;
         if (success) {
+          if (this.checked) {
+            localStorage.setItem('savedEmail', this.loginForm.get('email')?.value || '');
+            localStorage.setItem('savedPassword', this.loginForm.get('password')?.value || '');
+          }
           this.router.navigate(['/']);
           console.log(success)
-        } else {
-          this.error = 'Credenciales inválidas. Verifica tu email y contraseña.';
         }
       },
       error: (err) => {
         this.loading = false;
-        console.error('Error en login:', err);
-        this.error = err.error?.message || 'Error al iniciar sesión. Intenta nuevamente.';
+        console.error('Error en login:', err.message);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Correo o contraseña incorrecto'
+        });
       }
     });
   }

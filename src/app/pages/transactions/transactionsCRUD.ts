@@ -80,13 +80,6 @@ import { PrimengConfigService } from '../service/primengconfig.service';
             [disabled]="!selectedTransactions || selectedTransactions.length === 0" />
         </ng-template>
 
-        <!-- <ng-template #end>
-          <p-button 
-            label="Exportar" 
-            icon="pi pi-upload" 
-            severity="secondary" 
-            (onClick)="exportCSV()" />
-        </ng-template> -->
       </p-toolbar>
           <p-toast
             position="top-right"
@@ -290,13 +283,13 @@ import { PrimengConfigService } from '../service/primengconfig.service';
         </div>
       }
       <p-dialog
-              [header]="editMode ? 'Editar Transacción' : 'Nueva Transacción'"
-              [(visible)]="displayAddTransactionDialog"
-              [modal]="true"
-              [style]="{width: '450px'}"
-              [draggable]="false"
-              [resizable]="false"
-              [closable]="true">
+      [header]="editMode ? 'Editar Transacción' : 'Nueva Transacción'"
+      [(visible)]="displayAddTransactionDialog"
+      [modal]="true"
+      [style]="{width: '450px'}"
+      [draggable]="false"
+      [resizable]="false"
+      [closable]="true">
 
               <ng-template #content>
                 <form [formGroup]="transactionForm" (ngSubmit)="onSubmitTransaction()">
@@ -429,67 +422,67 @@ import { PrimengConfigService } from '../service/primengconfig.service';
                 </div>
               </ng-template>
             </p-dialog>
-      <!-- PAGINACIÓN PERSONALIZADA -->
-      <div class="flex justify-between items-center mt-4 p-3 border-t">
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600">
-            Mostrando {{ paginationService.getStartRecord() }} a {{ paginationService.getEndRecord() }} de {{ paginationService.paginationData().totalCount }} registros
-          </span>
-        </div>
-        
-        <div class="flex items-center gap-2">
-          <!-- Botón Primera Página -->
-          <button
-            pButton
-            icon="pi pi-angle-double-left"
-            class="p-button-text p-button-sm"
-            [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
-            (click)="goToFirstPage()"
-            pTooltip="Primera página">
-          </button>
+          <!-- PAGINACIÓN PERSONALIZADA -->
+          <div class="flex justify-between items-center mt-4 p-3 border-t">
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-600">
+                Mostrando {{ paginationService.getStartRecord() }} a {{ paginationService.getEndRecord() }} de {{ paginationService.paginationData().totalCount }} registros
+              </span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <!-- Botón Primera Página -->
+              <button
+                pButton
+                icon="pi pi-angle-double-left"
+                class="p-button-text p-button-sm"
+                [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
+                (click)="goToFirstPage()"
+                pTooltip="Primera página">
+              </button>
 
-          <button
-            pButton
-            icon="pi pi-angle-left"
-            class="p-button-text p-button-sm"
-            [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
-            (click)="goToPreviousPage()"
-            pTooltip="Página anterior">
-          </button>
+              <button
+                pButton
+                icon="pi pi-angle-left"
+                class="p-button-text p-button-sm"
+                [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
+                (click)="goToPreviousPage()"
+                pTooltip="Página anterior">
+              </button>
 
-          <span class="text-sm font-medium text-gray-700 px-3">
-                Página {{ paginationService.paginationData().currentPage }} de {{ paginationService.paginationData().totalPages }}
-            </span>
+              <span class="text-sm font-medium text-gray-700 px-3">
+                    Página {{ paginationService.paginationData().currentPage }} de {{ paginationService.paginationData().totalPages }}
+                </span>
 
-          <button
-            pButton
-            icon="pi pi-angle-right"
-            class="p-button-text p-button-sm"
-            [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
-            (click)="goToNextPage()"
-            pTooltip="Página siguiente">
-          </button>
+              <button
+                pButton
+                icon="pi pi-angle-right"
+                class="p-button-text p-button-sm"
+                [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
+                (click)="goToNextPage()"
+                pTooltip="Página siguiente">
+              </button>
 
-          <button
-            pButton
-            icon="pi pi-angle-double-right"
-            class="p-button-text p-button-sm"
-            [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
-            (click)="goToLastPage()"
-            pTooltip="Última página">
-          </button>
-        </div>
-        <div class="flex items-center gap-2">
-          <label class="text-sm">Filas por página:</label>
-          <p-select 
-            [options]="paginationService.rowsPerPageOptions"
-            [(ngModel)]="currentPageSize"
-            (onChange)="onRowsPerPageChange($event)"
-            [style]="{'min-width': '80px'}"
-            placeholder="5">
-          </p-select>
-        </div>
-      </div>
+              <button
+                pButton
+                icon="pi pi-angle-double-right"
+                class="p-button-text p-button-sm"
+                [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
+                (click)="goToLastPage()"
+                pTooltip="Última página">
+              </button>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="text-sm">Filas por página:</label>
+              <p-select 
+                [options]="paginationService.rowsPerPageOptions"
+                [(ngModel)]="currentPageSize"
+                (onChange)="onRowsPerPageChange($event)"
+                [style]="{'min-width': '80px'}"
+                placeholder="5">
+              </p-select>
+            </div>
+          </div>
     </div>
     <p-confirmdialog [style]="{ width: '450px' }" />
   `,
@@ -558,7 +551,7 @@ export class TransactionsCRUD implements OnInit {
     { label: 'Gasto', value: 'gasto' },
   ];
 
-  currentPageSize = 10;
+  currentPageSize = 5;
 
   constructor() {
     this.initializeForm();
@@ -566,7 +559,7 @@ export class TransactionsCRUD implements OnInit {
 
   ngOnInit() {
     console.log('TRANSACTIONS CRUD INIT');
-    this.paginationService.initialize(10);
+    this.paginationService.initialize(this.currentPageSize);
     this.loadTransactions()
     this.loadCategories()
     this.loadAccounts()

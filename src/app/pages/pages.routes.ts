@@ -15,8 +15,8 @@ export default [
   { path: 'categorias', component: CategoriesCRUD, canActivate: [AuthGuard] },
   { path: 'cuentas', component: AccountsCRUD, canActivate: [AuthGuard] },
   // { path: 'documentation', component: Documentation },
-  // { path: 'login', component: Login },
+  { path: 'login', component: Login },
   // { path: 'crud', component: Crud },
-  { path: 'empty', component: Empty },
+  // { path: 'empty', component: Empty },
   { path: '**', redirectTo: '/notfound' }
 ] as Routes;
