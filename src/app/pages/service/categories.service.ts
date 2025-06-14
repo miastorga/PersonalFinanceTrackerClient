@@ -2,40 +2,6 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 
-export interface QueryParametersSummary {
-  startDate?: string | null;
-  endDate?: string | null;
-  period?: string | null;
-}
-
-export interface QueryParametersTransaction {
-  page: number,
-  results: number
-  startDate?: string | null;
-  endDate?: string | null;
-  categoryName?: string
-  transactionType?: string
-}
-
-export interface SummaryResponse {
-  totalIncome: number;
-  totalExpenses: number;
-  balance: number;
-  startDate: string;
-  endDate: string;
-  period: string;
-  expensesByCategory: { [key: string]: number };
-  incomeByCategory: { [key: string]: number };
-  balanceByAccount: { [key: string]: number };
-  transactionCount: number;
-  averageTransactionAmount: number;
-  topExpenseCategory: string;
-  topIncomeCategory: string;
-  previousPeriodBalance: number;
-  balanceChange: number;
-  balanceChangePercentage: number;
-}
-
 export interface Category {
   categoryId: string
   categoryName: string
@@ -49,10 +15,6 @@ export interface CreateCategoryResponse {
   categoryId: string
   categoryName: string
 }
-
-// export interface CategoryResponse {
-//   items: Transaction[];
-// }
 
 @Injectable({
   providedIn: 'root'
@@ -93,17 +55,6 @@ export class CategoriesService {
       catchError(this.handleError)
     )
   }
-
-  private objectToHttpParams(obj: any): HttpParams {
-    let params = new HttpParams();
-    Object.keys(obj).forEach(key => {
-      if (obj[key] !== null && obj[key] !== undefined) {
-        params = params.set(key, obj[key].toString());
-      }
-    });
-    return params;
-  }
-
   /**
    * Maneja errores HTTP
    */

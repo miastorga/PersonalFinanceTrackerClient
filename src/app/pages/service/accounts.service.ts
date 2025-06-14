@@ -2,72 +2,20 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 
-export interface QueryParametersSummary {
-  startDate?: string | null;
-  endDate?: string | null;
-  period?: string | null;
-}
-
-export interface QueryParametersTransaction {
-  page: number,
-  results: number
-  startDate?: string | null;
-  endDate?: string | null;
-  categoryName?: string
-  transactionType?: string
-}
-
-export interface SummaryResponse {
-  totalIncome: number;
-  totalExpenses: number;
-  balance: number;
-  startDate: string;
-  endDate: string;
-  period: string;
-  expensesByCategory: { [key: string]: number };
-  incomeByCategory: { [key: string]: number };
-  balanceByAccount: { [key: string]: number };
-  transactionCount: number;
-  averageTransactionAmount: number;
-  topExpenseCategory: string;
-  topIncomeCategory: string;
-  previousPeriodBalance: number;
-  balanceChange: number;
-  balanceChangePercentage: number;
-}
-
 export interface Account {
   accountId: string
   accountName: string
   accountType: string
   currentBalance: number
-  initialBalance: 0
+  initialBalance: number
 }
 
-export interface CreateTransaction {
-  amount: number;
-  transactionType: "gasto" | "ingreso";
-  categoryId: string;
-  date: string;
-  description: string;
-  accountId: string | null;
+export interface CreateAccount {
+  accountName: string
+  accountType: string
+  currentBalance: number
+  initialBalance: number
 }
-
-export interface CreateTransactionResponse {
-  transactionId: string
-  amount: number;
-  transactionType: "gasto" | "ingreso";
-  categoryId: string;
-  categoryName: string;
-  date: string;
-  description: string;
-  accountId: string | null;
-  accountName: string | null;
-}
-
-// export interface CategoryResponse {
-//   items: Transaction[];
-// }
 
 @Injectable({
   providedIn: 'root'
@@ -83,67 +31,63 @@ export class AccountsService {
     )
   }
 
-  createTransaction(params: CreateTransaction) {
+  createAccounts(params: CreateAccount) {
     console.log(params)
-    return this.http.post<CreateTransactionResponse>(this.URL, params).pipe(
-      catchError(this.handleError)
+    return this.http.post<Account>(this.URL, params).pipe(
+      catchError(error => this.handleError(error))
     )
   }
 
-  removeTransaction(id: string) {
+  removeAccount(id: string) {
     return this.http.delete<void>(`${this.URL}/${id}`).pipe(
       catchError(this.handleError)
     )
   }
 
-  updateTransaction(id: string, params: CreateTransaction) {
+  updateAccount(id: string, params: CreateAccount) {
     console.log(id)
     console.log(params)
-    return this.http.put<CreateTransaction>(`${this.URL}/${id}`, params).pipe(
+    return this.http.put<Account>(`${this.URL}/${id}`, params).pipe(
       catchError(this.handleError)
     )
   }
 
-  private objectToHttpParams(obj: any): HttpParams {
-    let params = new HttpParams();
-    Object.keys(obj).forEach(key => {
-      if (obj[key] !== null && obj[key] !== undefined) {
-        params = params.set(key, obj[key].toString());
-      }
-    });
-    return params;
-  }
 
   /**
    * Maneja errores HTTP
    */
-  private handleError = (error: HttpErrorResponse): Observable<never> => {
+  private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Error desconocido';
 
-    if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente
-      errorMessage = `Error: ${error.error.message}`;
-    } else {
-      // Error del lado del servidor
-      switch (error.status) {
-        case 400:
-          errorMessage = 'Solicitud inválida. Verifica los parámetros.';
-          break;
-        case 401:
-          errorMessage = 'No autorizado. Verifica tus credenciales.';
-          break;
-        case 404:
-          errorMessage = 'Recurso no encontrado.';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor.';
-          break;
-        default:
-          errorMessage = `Error ${error.status}: ${error.message}`;
-      }
+    if (error.error && error.error.errors) {
+      const validationErrors = error.error.errors;
+      const errorMessages: string[] = [];
+
+      Object.keys(validationErrors).forEach(field => {
+        const fieldName = this.translateFieldName(field);
+        validationErrors[field].forEach((message: string) => {
+          errorMessages.push(`${fieldName}: ${message}`);
+        });
+      });
+
+      errorMessage = errorMessages.join('\n');
     }
 
-    console.error('Error en TransactionsService:', error);
     return throwError(() => new Error(errorMessage));
+  }
+
+  private translateFieldName(fieldName: string): string {
+    const translations: { [key: string]: string } = {
+      'accountName': 'Nombre de la cuenta',
+      'AccountName': 'Nombre de la cuenta',
+      'accountType': 'Tipo de cuenta',
+      'AccountType': 'Tipo de cuenta',
+      'currentBalance': 'Saldo actual',
+      'CurrentBalance': 'Saldo actual',
+      'initialBalance': 'Saldo inicial',
+      'InitialBalance': 'Saldo inicial'
+    };
+
+    return translations[fieldName] || fieldName;
   }
 }

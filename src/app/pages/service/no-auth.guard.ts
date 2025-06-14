@@ -20,7 +20,6 @@ export class NoAuthGuard implements CanActivate {
     return this.authService.isAuthenticated$.pipe(
       map(isAuthenticated => {
         if (isAuthenticated && !this.authService.isTokenExpired()) {
-          // Si ya está autenticado, redirigir a la raíz (dashboard)
           this.router.navigate(['/']);
           return false;
         } else {

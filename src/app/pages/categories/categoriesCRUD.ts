@@ -104,17 +104,9 @@ export interface CreateCategory {
             <th style="width: 3rem">
               <p-tableHeaderCheckbox />
             </th>
-            <th style="min-width: 15rem" pSortableColumn="categoryId">
+            <th style="min-width: 15rem" >
               <div class="flex justify-between items-center">
                 Id
-                <p-columnFilter 
-                  type="text" 
-                  field="categoryId" 
-                  display="menu" 
-                  placeholder="Buscar por ID"
-                  [matchModeOptions]="primengConfig.textFilterOptions">
-                </p-columnFilter>
-                <p-sortIcon field="categoryId"></p-sortIcon>
               </div>
             </th>
             <th style="min-width: 20rem" pSortableColumn="categoryName">

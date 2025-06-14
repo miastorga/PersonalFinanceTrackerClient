@@ -33,7 +33,6 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         if (isAuthenticated && !this.authService.isTokenExpired()) {
           return true;
         } else {
-          // Guardar la URL a la que quería acceder para redirigir después del login
           localStorage.setItem('redirectUrl', url);
           this.router.navigate(['/login']);
           return false;

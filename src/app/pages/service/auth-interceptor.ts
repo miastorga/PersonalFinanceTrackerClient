@@ -5,11 +5,7 @@ import { AuthService } from './auth.service';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
 
-  console.log('📡 Interceptor ejecutándose para:', req.url);
-
   const token = authService.getToken();
-  console.log('🔐 Token encontrado:', token ? 'SÍ' : 'NO');
-  console.log('⏰ Token expirado:', authService.isTokenExpired());
 
   if (token && !authService.isTokenExpired()) {
     const authReq = req.clone({
@@ -23,6 +19,5 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(authReq);
   }
 
-  console.log('❌ Request SIN Authorization header');
   return next(req);
 };
