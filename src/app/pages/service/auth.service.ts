@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 interface LoginResponse {
   tokenType: string;
@@ -15,6 +15,19 @@ interface LoginRequest {
   password: string;
 }
 
+export interface Root {
+  type: string
+  title: string
+  status: number
+  errors: Errors
+}
+
+export interface Errors {
+  DuplicateUserName: string[]
+  DuplicateEmail: string[]
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -25,6 +38,15 @@ export class AuthService {
 
   constructor(private http: HttpClient) {
     this.checkAuthStatus();
+  }
+
+  register(credentials: LoginRequest): Observable<boolean> {
+    return this.http.post<LoginRequest>(`${this.apiUrl}/register`, credentials).pipe(
+      map(() => true),
+      catchError(error => {
+        throw error
+      })
+    )
   }
 
   login(credentials: LoginRequest): Observable<boolean> {
@@ -40,7 +62,6 @@ export class AuthService {
             expirationDate.setSeconds(expirationDate.getSeconds() + response.expiresIn);
             localStorage.setItem('tokenExpiration', expirationDate.toISOString());
 
-            console.log(response)
             this.isAuthenticatedSubject.next(true);
             return true;
           }
