@@ -163,11 +163,11 @@ export class Login implements OnInit {
 
   private initializeForm(): void {
     this.loginForm = this.fb.group({
-      email: ['', [
+      email: ['prueba@gmail.com', [
         Validators.required,
         Validators.email
       ]],
-      password: ['', [
+      password: ['Hola123$', [
         Validators.required,
         Validators.minLength(6)
       ]],
