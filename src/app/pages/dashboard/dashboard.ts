@@ -4,37 +4,38 @@ import { GastosPorCategoria } from './components/gastosporcategoria';
 import { Transacciones } from './components/transacciones';
 import { QueryParametersSummary, QueryParametersTransaction, SummaryResponse, TransactionResponse, TransactionsService } from '../service/transactions.service';
 import { IngresosPorCategoria } from "./components/ingresoporcategoria";
+import { Account, AccountsService } from '../service/accounts.service';
+import { AccountSummaryChartComponent } from "./components/accountsumarrychart";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [StatsWidget, IngresosPorCategoria, GastosPorCategoria, IngresosPorCategoria, Transacciones],
+  imports: [StatsWidget, IngresosPorCategoria, GastosPorCategoria, IngresosPorCategoria, Transacciones, AccountSummaryChartComponent],
   template: `
 <div class="grid grid-cols-12 gap-8">
-    <!-- Stats Widget con Spinner -->
     <div class="contents">
         @if (isLoadingSummary()) {
             <div class="col-span-12 sm:col-span-6 lg:col-span-3">
-                <div class="bg-white rounded-lg shadow-sm border p-6 h-32 flex flex-col justify-center items-center">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 h-32 flex flex-col justify-center items-center">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
-                    <div class="h-2 bg-gray-200 rounded animate-pulse w-16"></div>
+                    <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-16"></div>
                 </div>
             </div>
             <div class="col-span-12 sm:col-span-6 lg:col-span-3">
-                <div class="bg-white rounded-lg shadow-sm border p-6 h-32 flex flex-col justify-center items-center">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 h-32 flex flex-col justify-center items-center">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-2"></div>
-                    <div class="h-2 bg-gray-200 rounded animate-pulse w-20"></div>
+                    <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-20"></div>
                 </div>
             </div>
             <div class="col-span-12 sm:col-span-6 lg:col-span-3">
-                <div class="bg-white rounded-lg shadow-sm border p-6 h-32 flex flex-col justify-center items-center">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 h-32 flex flex-col justify-center items-center">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-2"></div>
-                    <div class="h-2 bg-gray-200 rounded animate-pulse w-24"></div>
+                    <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-24"></div>
                 </div>
             </div>
             <div class="col-span-12 sm:col-span-6 lg:col-span-3">
-                <div class="bg-white rounded-lg shadow-sm border p-6 h-32 flex flex-col justify-center items-center">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 h-32 flex flex-col justify-center items-center">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mb-2"></div>
-                    <div class="h-2 bg-gray-200 rounded animate-pulse w-18"></div>
+                    <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-18"></div>
                 </div>
             </div>
         } @else {
@@ -44,10 +45,9 @@ import { IngresosPorCategoria } from "./components/ingresoporcategoria";
 
     <div class="col-span-12 xl:col-span-6">
         @if (isLoadingSummary()) {
-            <div class="bg-white rounded-lg shadow p-6 h-96 flex justify-center items-center">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow border dark:border-gray-700 p-6 h-96 flex justify-center items-center">
                 <div class="text-center">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                    <!-- <p class="text-gray-500 text-sm">Cargando gastos...</p> -->
                 </div>
             </div>
         } @else {
@@ -55,13 +55,11 @@ import { IngresosPorCategoria } from "./components/ingresoporcategoria";
         }
     </div>
 
-    <!-- Ingresos por Categoría con Spinner -->
     <div class="col-span-12 xl:col-span-6">
         @if (isLoadingSummary()) {
-            <div class="bg-white rounded-lg shadow p-6 h-96 flex justify-center items-center">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow border dark:border-gray-700 p-6 h-96 flex justify-center items-center">
                 <div class="text-center">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                    <!-- <p class="text-gray-500 text-sm">Cargando ingresos...</p> -->
                 </div>
             </div>
         } @else {
@@ -71,18 +69,31 @@ import { IngresosPorCategoria } from "./components/ingresoporcategoria";
 
     <div class="col-span-12">
         @if (isLoadingTransactions()) {
-            <div class="bg-white rounded-lg shadow p-6 h-96 flex justify-center items-center">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow border dark:border-gray-700 p-6 h-96 flex justify-center items-center">
                 <div class="text-center">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                    <!-- <p class="text-gray-500 text-sm">Cargando transacciones...</p> -->
                 </div>
             </div>
         } @else {
-            <app-transacciones [transacciones]="transactionSignal().items"/>
+          <app-account-summary-chart [transacctions]="transactionSignal().items"/>
         }
     </div>
+
+    <div class="col-span-12">
+        @if (isLoadingTransactions()) {
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow border dark:border-gray-700 p-6 h-96 flex justify-center items-center">
+                <div class="text-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                </div>
+            </div>
+        } @else {
+            <app-transacciones [transacciones]="transactionSignal().items.slice(0,5)"/>
+        }
+    </div>
+
+
 </div>
-    `
+`
 })
 export class Dashboard implements OnInit {
 
@@ -126,7 +137,7 @@ export class Dashboard implements OnInit {
   }
 
   loadTransactionSummary() {
-    this.isLoadingSummary.set(true) // Activar spinner
+    this.isLoadingSummary.set(true)
 
     const query: QueryParametersSummary = {
       startDate: '2025-01-01',
@@ -136,32 +147,33 @@ export class Dashboard implements OnInit {
     this.transactionService.getSummary(query).subscribe({
       next: (response) => {
         this.summarySignal.set(response)
-        this.isLoadingSummary.set(false) // Desactivar spinner
+        this.isLoadingSummary.set(false)
       },
       error: (error) => {
         console.error('Error getting summary:', error);
-        this.isLoadingSummary.set(false) // Desactivar spinner también en error
+        this.isLoadingSummary.set(false)
       }
     })
   }
 
   loadTransactions() {
-    this.isLoadingTransactions.set(true) // Activar spinner
+    this.isLoadingTransactions.set(true)
 
     const query: QueryParametersTransaction = {
       page: 1,
-      results: 6
+      results: 20
     }
 
     this.transactionService.getTransactions(query).subscribe({
       next: (response) => {
         console.log('Transaction data:', response.items);
         this.transactionSignal.set(response)
-        this.isLoadingTransactions.set(false) // Desactivar spinner
+        console.log(this.transactionSignal())
+        this.isLoadingTransactions.set(false)
       },
       error: (error) => {
         console.error('Error getting transactions:', error);
-        this.isLoadingTransactions.set(false) // Desactivar spinner también en error
+        this.isLoadingTransactions.set(false)
       }
     })
   }

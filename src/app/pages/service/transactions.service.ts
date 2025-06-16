@@ -45,6 +45,7 @@ export interface Transaction {
   date: string;
   description: string;
   accountId: string | null;
+  accountName: string | null;
 }
 
 export interface CreateTransaction {

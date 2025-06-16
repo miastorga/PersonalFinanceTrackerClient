@@ -32,7 +32,6 @@ import { SummaryResponse, TransactionsService } from '../../service/transactions
   providers: []
 })
 export class IngresosPorCategoria {
-  transactionService = inject(TransactionsService)
   summary = input.required<SummaryResponse>()
 
   constructor() { }

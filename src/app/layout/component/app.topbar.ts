@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -36,7 +36,7 @@ import { Ripple } from 'primeng/ripple';
                         />
                     </g>
                 </svg>
-                <span>SAKAI</span>
+                <!-- <span>SAKAI</span> -->
             </a>
         </div>
 
@@ -104,9 +104,11 @@ import { Ripple } from 'primeng/ripple';
     `
   ]
 })
-export class AppTopbar {
+export class AppTopbar implements OnInit {
   @ViewChild('profileMenu') profileMenu!: Menu;
   profileMenuItems: MenuItem[];
+
+  private readonly DARK_MODE_KEY = 'darkModeEnabled';
 
   constructor(private router: Router, public layoutService: LayoutService) {
     this.profileMenuItems = [
@@ -137,9 +139,43 @@ export class AppTopbar {
     ];
   }
 
-  test() {
-    console.log('gola')
+  ngOnInit(): void {
+    this.loadDarkModeFromStorage();
   }
+
+  /**
+   * Carga el estado del dark mode desde localStorage al inicializar el componente
+   */
+  private loadDarkModeFromStorage(): void {
+    try {
+      const savedDarkMode = localStorage.getItem(this.DARK_MODE_KEY);
+      if (savedDarkMode !== null) {
+        const isDarkMode = JSON.parse(savedDarkMode);
+
+        // Solo actualizar si es diferente al estado actual
+        if (this.layoutService.isDarkTheme() !== isDarkMode) {
+          this.layoutService.layoutConfig.update((state) => ({
+            ...state,
+            darkTheme: isDarkMode
+          }));
+        }
+      }
+    } catch (error) {
+      console.warn('Error loading dark mode from localStorage:', error);
+    }
+  }
+
+  /**
+   * Guarda el estado del dark mode en localStorage
+   */
+  private saveDarkModeToStorage(isDarkMode: boolean): void {
+    try {
+      localStorage.setItem(this.DARK_MODE_KEY, JSON.stringify(isDarkMode));
+    } catch (error) {
+      console.warn('Error saving dark mode to localStorage:', error);
+    }
+  }
+
   showProfileMenu(event: Event) {
     console.log('showProfileMenu called');
     console.log('profileMenu:', this.profileMenu);
@@ -163,6 +199,16 @@ export class AppTopbar {
   }
 
   toggleDarkMode() {
-    this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
+    // Cambiar el estado del dark mode
+    const newDarkModeState = !this.layoutService.isDarkTheme();
+
+    // Actualizar el estado en el servicio
+    this.layoutService.layoutConfig.update((state) => ({
+      ...state,
+      darkTheme: newDarkModeState
+    }));
+
+    // Guardar el nuevo estado en localStorage
+    this.saveDarkModeToStorage(newDarkModeState);
   }
 }

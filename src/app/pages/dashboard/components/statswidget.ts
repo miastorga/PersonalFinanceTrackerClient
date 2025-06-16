@@ -45,7 +45,7 @@ import { QueryParametersSummary, SummaryResponse, TransactionsService } from '..
                         <i class="pi pi-users text-cyan-500 !text-xl"></i>
                     </div>
                 </div>
-                <span class="text-primary font-medium">{{summary().balanceChange}}</span>
+                <span class="text-primary font-medium">{{summary().balanceChange  | currency:'USD':'symbol':'1.0-0'}}</span>
             </div>
         </div>
         <div class="col-span-12 lg:col-span-6 xl:col-span-3">
@@ -59,7 +59,7 @@ import { QueryParametersSummary, SummaryResponse, TransactionsService } from '..
                         <i class="pi pi-comment text-purple-500 !text-xl"></i>
                     </div>
                 </div>
-                <span class="text-primary font-medium">Prom: &#36;{{summary().averageTransactionAmount}} </span>
+                <span class="text-primary font-medium">Prom: &#36;{{summary().averageTransactionAmount | currency:'USD':'symbol':'1.0-0'}} </span>
             </div>
         </div>`
 })

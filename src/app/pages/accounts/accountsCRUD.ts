@@ -477,7 +477,6 @@ export class AccountsCRUD implements OnInit {
       next: (response: Account[]) => {
         this.accountsSignal.set(response);
         this.loading = false;
-        console.log(this.accountsSignal())
       },
       error: (error) => {
         this.messageService.add({
@@ -514,7 +513,6 @@ export class AccountsCRUD implements OnInit {
       initialBalance: account.initialBalance,
       currentBalance: account.currentBalance
     });
-    console.log('VALOR ASIGNADO al form:', this.accountForm.get('accountType')?.value);
   }
 
   hideAddAccountDialog() {
@@ -537,12 +535,6 @@ export class AccountsCRUD implements OnInit {
       this.savingAccount = true;
 
       const formData = this.accountForm.value;
-      console.log('=== DEBUG ENVÍO ===');
-      console.log('Form accountType value:', formData.accountType);
-      console.log('Form accountType LENGTH:', formData.accountType?.length);
-      console.log('=== FIN DEBUG ENVÍO ===');
-
-      // Para crear cuenta nueva
       if (!this.editMode) {
         const accountData: CreateAccount = {
           accountName: formData.accountName.trim(),
@@ -699,7 +691,6 @@ export class AccountsCRUD implements OnInit {
   }
 
   getAccountTypeSeverity(type: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' | undefined {
-    console.log(type)
     switch (type?.toLowerCase()) {
       case 'inversión':
         return 'success';
