@@ -280,7 +280,6 @@ export class CategoriesCRUD implements OnInit {
   }
 
   ngOnInit() {
-    console.log('CATEGORIES CRUD INIT');
     this.loadCategories();
   }
 
@@ -294,12 +293,10 @@ export class CategoriesCRUD implements OnInit {
     this.loading = true;
     this.categoriesService.getCategories().subscribe({
       next: (response: Category[]) => {
-        console.log('categories data:', response);
         this.categoriesSignal.set(response);
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error getting categories:', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -339,7 +336,6 @@ export class CategoriesCRUD implements OnInit {
   }
 
   onSubmitCategory() {
-    console.log('submit category');
     if (this.categoryForm.valid) {
       this.savingCategory = true;
 
@@ -363,7 +359,6 @@ export class CategoriesCRUD implements OnInit {
               this.savingCategory = false;
             },
             error: (error) => {
-              console.error('Error actualizando categoría:', error);
               this.messageService.add({
                 severity: 'error',
                 summary: 'Error',
@@ -388,7 +383,6 @@ export class CategoriesCRUD implements OnInit {
               this.savingCategory = false;
             },
             error: (error) => {
-              console.error('Error creando categoría:', error);
               this.messageService.add({
                 severity: 'error',
                 summary: 'Error',
@@ -421,8 +415,6 @@ export class CategoriesCRUD implements OnInit {
 
   // Métodos para eliminar categorías
   deleteCategory(category: Category) {
-    console.log('borrar categoría');
-    console.log(category.categoryId);
     this.confirmationService.confirm({
       message: `¿Está seguro de que desea eliminar la categoría "${category.categoryName}"?`,
       header: 'Confirmar Eliminación',
@@ -431,7 +423,6 @@ export class CategoriesCRUD implements OnInit {
         // Asumiendo que tienes un método removeCategory en tu servicio
         this.categoriesService.removeCategory(category.categoryId).subscribe({
           next: (response) => {
-            console.log('Categoría eliminada:', response);
             this.loadCategories();
             this.messageService.add({
               severity: 'success',
@@ -440,7 +431,6 @@ export class CategoriesCRUD implements OnInit {
             });
           },
           error: (error) => {
-            console.error('Error eliminando categoría:', error);
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
@@ -453,7 +443,6 @@ export class CategoriesCRUD implements OnInit {
   }
 
   deleteSelectedCategories() {
-    console.log(this.selectedCategories);
     this.confirmationService.confirm({
       message: '¿Está seguro de que desea eliminar las categorías seleccionadas?',
       header: 'Confirmar Eliminación',
@@ -465,7 +454,6 @@ export class CategoriesCRUD implements OnInit {
 
         forkJoin(deleteObservables!).subscribe({
           next: (responses) => {
-            console.log('Todas las categorías eliminadas:', responses);
             this.messageService.add({
               severity: 'success',
               summary: 'Éxito',
@@ -475,7 +463,6 @@ export class CategoriesCRUD implements OnInit {
             this.loadCategories();
           },
           error: (error) => {
-            console.error('Error eliminando categorías:', error);
             this.messageService.add({
               severity: 'error',
               summary: 'Error',

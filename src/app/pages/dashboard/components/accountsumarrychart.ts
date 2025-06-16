@@ -31,7 +31,6 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.initChart();
-    console.log('Transacciones recibidas en ngOnInit:', this.transacctions());
   }
 
   ngOnDestroy(): void {
@@ -81,7 +80,6 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
     const expenseData = labels.map((label) => accountExpenseAmounts[label]);
     const incomeData = labels.map((label) => accountIncomeAmounts[label]);
 
-    console.log('Conteo de transacciones por tipo y cuenta:', this.accountTypeCounts);
 
     this.chartData = {
       labels: labels,

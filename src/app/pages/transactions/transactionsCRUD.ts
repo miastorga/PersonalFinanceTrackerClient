@@ -558,7 +558,6 @@ export class TransactionsCRUD implements OnInit {
   }
 
   ngOnInit() {
-    console.log('TRANSACTIONS CRUD INIT');
     this.paginationService.initialize(this.currentPageSize);
     this.loadTransactions()
     this.loadCategories()
@@ -581,7 +580,6 @@ export class TransactionsCRUD implements OnInit {
     this.paginationService.loadData((page, pageSize) =>
       this.transactionService.getTransactions({ page, results: pageSize })
     );
-    console.log('trans ' + this.paginationService.items())
   }
 
   getAccountName(transaction: Transaction) {
@@ -592,14 +590,12 @@ export class TransactionsCRUD implements OnInit {
     this.loading = true;
     this.categoriesService.getCategories().subscribe({
       next: (response: Category[]) => {
-        console.log('categories data:', response);
 
         this.categoriesSignal.set(response)
 
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error getting transactions:', error);
         this.loading = false;
       }
     })
@@ -609,14 +605,12 @@ export class TransactionsCRUD implements OnInit {
     this.loading = true
     this.accountService.getAccounts().subscribe({
       next: (response: Account[]) => {
-        console.log('accoutns data:', response);
 
         this.accountsSignal.set(response)
 
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error getting transactions:', error);
         this.loading = false;
       }
     })
@@ -634,7 +628,6 @@ export class TransactionsCRUD implements OnInit {
     this.currentTransactionId = transaction.transactionId || null;
     this.displayAddTransactionDialog = true;
 
-    console.log(transaction)
 
     this.transactionForm.patchValue({
       amount: transaction.amount,
@@ -672,12 +665,10 @@ export class TransactionsCRUD implements OnInit {
   }
 
   onSubmitTransaction() {
-    console.log('submit')
     if (this.transactionForm.valid) {
       this.savingTransaction = true;
 
       const formData = this.transactionForm.value;
-      console.log(formData)
       const transactionData: CreateTransaction = {
         amount: formData.amount,
         description: formData.description,
@@ -689,7 +680,6 @@ export class TransactionsCRUD implements OnInit {
 
       try {
         if (this.editMode) {
-          console.log('editar')
           this.transactionService.updateTransaction(this.currentTransactionId!, transactionData).subscribe({
             next: (response) => {
               this.loadTransactions();
@@ -702,7 +692,6 @@ export class TransactionsCRUD implements OnInit {
               this.savingTransaction = false;
             },
             error: (error) => {
-              console.error('Error actualizando transacción:', error);
               this.messageService.add({
                 severity: 'error',
                 summary: 'Error',
@@ -724,7 +713,6 @@ export class TransactionsCRUD implements OnInit {
               this.savingTransaction = false;
             },
             error: (error) => {
-              console.error('Error creando transacción:', error);
               this.messageService.add({
                 severity: 'error',
                 summary: 'Error',
@@ -757,8 +745,6 @@ export class TransactionsCRUD implements OnInit {
 
   // Métodos para eliminar transacciones
   deleteTransaction(transaction: Transaction) {
-    console.log('borrar  trans')
-    console.log(transaction.transactionId)
     this.confirmationService.confirm({
       message: `¿Está seguro de que desea eliminar la transacción "${transaction.description}"?`,
       header: 'Confirmar Eliminación',
@@ -766,7 +752,6 @@ export class TransactionsCRUD implements OnInit {
       accept: () => {
         this.transactionService.removeTransaction(transaction.transactionId).subscribe({
           next: (response) => {
-            console.log('Transacción creada:', response);
             this.messageService.add({
               severity: 'success',
               summary: 'Éxito',
@@ -778,7 +763,6 @@ export class TransactionsCRUD implements OnInit {
             this.savingTransaction = false;
           },
           error: (error) => {
-            console.error('Error creando transacción:', error);
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
@@ -792,7 +776,6 @@ export class TransactionsCRUD implements OnInit {
   }
 
   deleteSelectedTransactions() {
-    console.log(this.selectedTransactions)
     this.confirmationService.confirm({
       message: '¿Está seguro de que desea eliminar las transacciones seleccionadas?',
       header: 'Confirmar Eliminación',
@@ -804,7 +787,6 @@ export class TransactionsCRUD implements OnInit {
 
         forkJoin(deleteObservables!).subscribe({
           next: (responses) => {
-            console.log('Todas las transacciones eliminadas:', responses);
 
             this.messageService.add({
               severity: 'success',
@@ -817,7 +799,6 @@ export class TransactionsCRUD implements OnInit {
             this.savingTransaction = false;
           },
           error: (error) => {
-            console.error('Error eliminando transacciones:', error);
             this.messageService.add({
               severity: 'error',
               summary: 'Error',

@@ -4,7 +4,6 @@ import { GastosPorCategoria } from './components/gastosporcategoria';
 import { Transacciones } from './components/transacciones';
 import { QueryParametersSummary, QueryParametersTransaction, SummaryResponse, TransactionResponse, TransactionsService } from '../service/transactions.service';
 import { IngresosPorCategoria } from "./components/ingresoporcategoria";
-import { Account, AccountsService } from '../service/accounts.service';
 import { AccountSummaryChartComponent } from "./components/accountsumarrychart";
 
 @Component({
@@ -150,7 +149,6 @@ export class Dashboard implements OnInit {
         this.isLoadingSummary.set(false)
       },
       error: (error) => {
-        console.error('Error getting summary:', error);
         this.isLoadingSummary.set(false)
       }
     })
@@ -166,13 +164,10 @@ export class Dashboard implements OnInit {
 
     this.transactionService.getTransactions(query).subscribe({
       next: (response) => {
-        console.log('Transaction data:', response.items);
         this.transactionSignal.set(response)
-        console.log(this.transactionSignal())
         this.isLoadingTransactions.set(false)
       },
       error: (error) => {
-        console.error('Error getting transactions:', error);
         this.isLoadingTransactions.set(false)
       }
     })

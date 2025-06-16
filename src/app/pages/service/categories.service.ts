@@ -21,8 +21,8 @@ export interface CreateCategoryResponse {
 })
 export class CategoriesService {
   private http = inject(HttpClient)
-  // private URL = "https://financetrackerapi.happyisland-59300aa5.brazilsouth.azurecontainerapps.io/api/v1/Category"
-  private URL = 'http://localhost:5022/api/v1/Category'
+  private URL = "https://financetrackerapi.happyisland-59300aa5.brazilsouth.azurecontainerapps.io/api/v1/Category"
+  // private URL = 'http://localhost:5022/api/v1/Category'
   constructor() { }
 
   getCategories() {

@@ -215,14 +215,12 @@ export class Login implements OnInit {
     this.authService.login(loginData).subscribe({
       next: (success) => {
         this.loading = false;
-        console.log('login success')
         if (success) {
           if (this.checked) {
             localStorage.setItem('savedEmail', this.loginForm.get('email')?.value || '');
             localStorage.setItem('savedPassword', this.loginForm.get('password')?.value || '');
           }
           this.router.navigate(['/']);
-          console.log(success)
         }
       },
       error: (err) => {
