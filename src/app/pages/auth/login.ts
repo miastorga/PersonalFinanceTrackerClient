@@ -102,7 +102,6 @@ import { MessageService } from 'primeng/api';
                             </div>
                           </div>
 
-                          <!-- Opciones adicionales -->
                           <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                             <div class="flex items-center">
                               <p-checkbox  formControlName="rememberMe"  binary (onChange)="onRememberMeChange($event)" id="rememberme1" binary class="mr-2"></p-checkbox>
@@ -111,7 +110,6 @@ import { MessageService } from 'primeng/api';
                             <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary" routerLink="/register">¿No tienes una cuenta?</span>
                           </div>
 
-                          <!-- Botón Submit -->
                           <p-button
                             type="submit"
                             label="Sign In"

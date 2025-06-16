@@ -2,7 +2,7 @@ import { Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angul
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators, ValueChangeEvent } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
@@ -181,7 +181,8 @@ import { PrimengConfigService } from '../service/primengconfig.service';
             <td>
               <p-tag 
                 [value]="account.accountType" 
-                [severity]="getAccountTypeSeverity(account.accountType)">
+                [severity]="getAccountTypeSeverity(account.accountType)"
+                >
               </p-tag>
             </td>
             <td>
@@ -476,6 +477,7 @@ export class AccountsCRUD implements OnInit {
       next: (response: Account[]) => {
         this.accountsSignal.set(response);
         this.loading = false;
+        console.log(this.accountsSignal())
       },
       error: (error) => {
         this.messageService.add({
@@ -505,14 +507,6 @@ export class AccountsCRUD implements OnInit {
     this.editMode = true;
     this.currentAccountId = account.accountId || null;
     this.displayAddAccountDialog = true;
-
-    console.log('=== DEBUG CUENTA CORRIENTE ===');
-    console.log('account.accountType RAW:', account.accountType);
-    console.log('account.accountType LENGTH:', account.accountType.length);
-    console.log('account.accountType BYTES:', Array.from(account.accountType).map(c => c.charCodeAt(0)));
-    console.log('TIPO:', typeof account.accountType);
-
-    console.log('=== FIN DEBUG ===');
 
     this.accountForm.patchValue({
       accountName: account.accountName,
@@ -705,18 +699,19 @@ export class AccountsCRUD implements OnInit {
   }
 
   getAccountTypeSeverity(type: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' | undefined {
+    console.log(type)
     switch (type?.toLowerCase()) {
-      case 'savings':
+      case 'inversión':
         return 'success';
-      case 'checking':
+      case 'cuenta de ahorro':
         return 'info';
-      case 'investment':
+      case 'tarjeta de crédito':
         return 'warning';
-      case 'creditcard':
-      case 'loan':
+      case 'efectivo':
+      case 'prestámo':
       case 'deuda':
         return 'danger';
-      case 'cash':
+      case 'cuenta vista':
       case 'vista':
         return 'secondary';
       default:
@@ -724,9 +719,9 @@ export class AccountsCRUD implements OnInit {
     }
   }
 
-  getBalanceClass(balance: number): string {
-    if (balance > 0) return 'positive-balance';
-    if (balance < 0) return 'negative-balance';
-    return 'zero-balance';
-  }
+  // getBalanceClass(balance: number): string {
+  //   if (balance > 0) return 'positive-balance';
+  //   if (balance < 0) return 'negative-balance';
+  //   return 'zero-balance';
+  // }
 }
