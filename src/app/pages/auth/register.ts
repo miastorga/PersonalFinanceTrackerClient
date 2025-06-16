@@ -41,8 +41,7 @@ import { MessageService } from 'primeng/api';
                                     />
                                 </g>
                             </svg>
-                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Join PrimeLand!</div>
-                            <span class="text-muted-color font-medium">Create your account to get started</span>
+                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Registro</div>
                         </div>
 
                         <p-toast

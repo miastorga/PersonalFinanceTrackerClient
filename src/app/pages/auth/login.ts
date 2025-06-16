@@ -42,8 +42,20 @@ import { MessageService } from 'primeng/api';
                                     />
                                 </g>
                             </svg>
-                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Welcome to PrimeLand!</div>
-                            <button type="button"  class="text-muted-color font-medium">Sign in to continue</button>
+                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Inicio de Sesion</div>
+                            <button type="button"  class="text-muted-color font-medium">Inicia sesion para continuar</button>
+                            <p class="mt-3">Otras cuentas de prueba</p>
+                            <div class="text-surface-900 dark:text-surface-0 text-1xl font-medium mb-1 flex justify-between">
+                              <p>prueba1&#64;gmail.com</p>
+                              <p>Hola123$</p>
+                            </div>
+                            <div class="text-surface-900 dark:text-surface-0 text-1xl font-medium mb-1 flex justify-between">
+                              <p>prueba2&#64;gmail.com</p>
+                              <p>Prue987*$</p>
+                            </div>
+                            <div class="text-surface-900 dark:text-surface-0 text-1xl font-medium mb-1 flex justify-between">
+                              <p>prueba3&#64;gmail.com</p>
+                              <p>Aqz10?%oH</p>
                         </div>
 
                         <p-toast
@@ -71,17 +83,8 @@ import { MessageService } from 'primeng/api';
                               }
                             </div>
                           </div>
-                   <!-- <div *ngIf="isFieldInvalid('password')" class="error-messages">
-                              <small *ngIf="loginForm.get('password')?.errors?.['required']">
-                                La contraseña es requerida
-                              </small>
-                              <small *ngIf="loginForm.get('password')?.errors?.['minlength']">
-                                La contraseña debe tener al menos 6 caracteres
-                              </small>
-                            </div> -->
-                          <!-- Campo Password -->
                           <div class="field mb-6">
-                            <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+                            <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Contraseña</label>
                             <p-password id="password" type="password" placeholder="***********" formControlName="password" [toggleMask]="true" styleClass="mb-2" [fluid]="true" [feedback]="false"></p-password>
                             <div class="error-container min-h-[20px]">
                               @if(isFieldInvalid('password')){
@@ -103,9 +106,9 @@ import { MessageService } from 'primeng/api';
                           <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                             <div class="flex items-center">
                               <p-checkbox  formControlName="rememberMe"  binary (onChange)="onRememberMeChange($event)" id="rememberme1" binary class="mr-2"></p-checkbox>
-                              <label for="rememberme1">Remember me</label>
+                              <label for="rememberme1">Recordarme</label>
                             </div>
-                            <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
+                            <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary" routerLink="/register">¿No tienes una cuenta?</span>
                           </div>
 
                           <!-- Botón Submit -->
