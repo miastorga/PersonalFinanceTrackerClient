@@ -186,7 +186,7 @@ export class Login implements OnInit {
   }
 
   loadSavedCredentials(): void {
-    const rememberMe = this.loginForm.get('rememberMe')?.value;
+    const rememberMe = this.loginForm.get('rememberMe')?.value
 
     if (rememberMe) {
       const savedEmail = localStorage.getItem('savedEmail');
