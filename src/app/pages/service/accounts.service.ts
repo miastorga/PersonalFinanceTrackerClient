@@ -22,7 +22,8 @@ export interface CreateAccount {
 })
 export class AccountsService {
   private http = inject(HttpClient)
-  private URL = "http://localhost:5022/api/v1/Account"
+  // private URL = "https://financetrackerapi.happyisland-59300aa5.brazilsouth.azurecontainerapps.io/api/v1/Account"
+  private URL = 'http://localhost:5022/api/v1/Account'
   constructor() { }
 
   getAccounts() {

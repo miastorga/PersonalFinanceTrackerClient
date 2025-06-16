@@ -30,44 +30,6 @@ export class AppMenu {
           { label: 'Categorias', icon: 'pi pi-fw pi-tags', routerLink: ['/pages/categorias'] },
           { label: 'Cuentas', icon: 'pi pi-fw pi-wallet', routerLink: ['/pages/cuentas'] }
         ]
-      },
-      {
-        label: 'Pages',
-        icon: 'pi pi-fw pi-briefcase',
-        routerLink: ['/pages'],
-        items: [
-          // {
-          //   label: 'Landing',
-          //   icon: 'pi pi-fw pi-globe',
-          //   routerLink: ['/landing']
-          // },
-          {
-            label: 'Auth',
-            icon: 'pi pi-fw pi-user',
-            items: [
-              // {
-              //   label: 'Login',
-              //   icon: 'pi pi-fw pi-sign-in',
-              //   routerLink: ['/auth/login']
-              // },
-              {
-                label: 'Error',
-                icon: 'pi pi-fw pi-times-circle',
-                routerLink: ['/auth/error']
-              },
-              {
-                label: 'Access Denied',
-                icon: 'pi pi-fw pi-lock',
-                routerLink: ['/auth/access']
-              }
-            ]
-          },
-          {
-            label: 'Not Found',
-            icon: 'pi pi-fw pi-exclamation-circle',
-            routerLink: ['/pages/notfound']
-          }
-        ]
       }
     ];
   }

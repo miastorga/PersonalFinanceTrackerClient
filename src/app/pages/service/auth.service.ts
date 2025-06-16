@@ -10,7 +10,7 @@ interface LoginResponse {
   refreshToken: string;
 }
 
-interface LoginRequest {
+export interface LoginRequest {
   email: string;
   password: string;
 }
@@ -32,7 +32,9 @@ export interface Errors {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5022';
+  // private apiUrl = 'https://financetrackerapi.happyisland-59300aa5.brazilsouth.azurecontainerapps.io';
+  private apiUrl = 'http://localhost:5022'
+
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
@@ -50,6 +52,7 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<boolean> {
+    console.log(credentials)
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(
         map(response => {

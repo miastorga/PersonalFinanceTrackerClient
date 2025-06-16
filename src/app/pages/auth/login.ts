@@ -9,7 +9,7 @@ import { RippleModule } from 'primeng/ripple';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../service/auth.service';
+import { AuthService, LoginRequest } from '../service/auth.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
@@ -46,7 +46,7 @@ import { MessageService } from 'primeng/api';
                             <button type="button"  class="text-muted-color font-medium">Inicia sesion para continuar</button>
                             <p class="mt-3">Otras cuentas de prueba</p>
                             <div class="text-surface-900 dark:text-surface-0 text-1xl font-medium mb-1 flex justify-between">
-                              <p>prueba1&#64;gmail.com</p>
+                              <p>prueba&#64;gmail.com</p>
                               <p>Hola123$</p>
                             </div>
                             <div class="text-surface-900 dark:text-surface-0 text-1xl font-medium mb-1 flex justify-between">
@@ -163,7 +163,6 @@ export class Login implements OnInit {
     }
   }
 
-
   private initializeForm(): void {
     this.loginForm = this.fb.group({
       email: ['prueba@gmail.com', [
@@ -174,7 +173,7 @@ export class Login implements OnInit {
         Validators.required,
         Validators.minLength(6)
       ]],
-      rememberMe: [false]
+      rememberMe: [true]
     });
   }
 
@@ -205,17 +204,20 @@ export class Login implements OnInit {
   }
 
   onSubmit(): void {
-    console.log(this.loginForm.value)
     if (this.loginForm.invalid) {
       this.markFormGroupTouched();
       return;
     }
     this.loading = true;
-    const loginData = this.loginForm.value;
+    const loginData: LoginRequest = {
+      email: this.loginForm.get('email')?.value,
+      password: this.loginForm.get('password')?.value,
+    };
 
     this.authService.login(loginData).subscribe({
       next: (success) => {
         this.loading = false;
+        console.log('login success')
         if (success) {
           if (this.checked) {
             localStorage.setItem('savedEmail', this.loginForm.get('email')?.value || '');
