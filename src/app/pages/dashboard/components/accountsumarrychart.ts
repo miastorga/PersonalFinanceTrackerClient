@@ -1,20 +1,19 @@
-// account-summary-chart.component.ts
-
 import { Component, OnInit, OnDestroy, input, effect, signal } from '@angular/core';
 import { ChartModule } from 'primeng/chart';
 import { Subscription } from 'rxjs';
 import { Transaction } from '../../service/transactions.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   standalone: true,
   selector: 'app-account-summary-chart',
-  imports: [ChartModule],
+  imports: [ChartModule, CommonModule],
   template: `
     <div class="card !mb-8">
-      <div class="font-semibold text-xl mb-4">
+      <div class="font-semibold text-xl mb-4" [ngStyle]="{'color': headerTextColor}">
         Gastos vs. Ingresos por Cuenta
       </div>
-      <p-chart type="bar" [data]="chartData" [options]="chartOptions" class="h-80" />
+      <p-chart *ngIf="chartData && chartOptions" type="bar" [data]="chartData" [options]="chartOptions" class="h-80" />
     </div>
   `,
 })
@@ -23,6 +22,7 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
   chartOptions: any;
   subscription!: Subscription;
   private isDarkMode = signal(false);
+  headerTextColor: string = '#000000';
 
   accountTypeCounts: {
     [accountName: string]: { gastos: number; ingresos: number };
@@ -31,19 +31,22 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
   transacctions = input.required<Transaction[]>();
 
   constructor() {
-    // Detectar cambios en el tema
     effect(() => {
       this.detectTheme();
-      if (this.chartData) {
-        this.updateChartColors();
-      }
+      const colors = this.getThemeColors();
+      this.headerTextColor = colors.textColor;
+
+      this.chartData = null;
+      this.chartOptions = null;
+
+      setTimeout(() => {
+        this.initChart();
+      }, 0);
     });
   }
 
   ngOnInit() {
     this.initChart();
-
-    // Escuchar cambios en el tema
     this.observeThemeChanges();
   }
 
@@ -54,6 +57,12 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
   }
 
   private detectTheme() {
+    const darkModeEnabled = localStorage.getItem('darkModeEnabled');
+    if (darkModeEnabled !== null) {
+      this.isDarkMode.set(darkModeEnabled === 'true');
+      return;
+    }
+
     const htmlElement = document.documentElement;
     const isDark = htmlElement.classList.contains('dark') ||
       htmlElement.classList.contains('dark-theme') ||
@@ -64,7 +73,6 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
   }
 
   private observeThemeChanges() {
-    // Observar cambios en las clases del documento
     const observer = new MutationObserver(() => {
       this.detectTheme();
     });
@@ -74,7 +82,6 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
       attributeFilter: ['class', 'data-theme']
     });
 
-    // También escuchar cambios en el media query
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       this.detectTheme();
     });
@@ -84,31 +91,17 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
     const isDark = this.isDarkMode();
 
     return {
-      textColor: isDark ? '#ffffff' : '#374151',
-      textMutedColor: isDark ? '#9ca3af' : '#6b7280',
+      textColor: isDark ? '#ffffff' : '#000000',
+      textMutedColor: isDark ? '#e5e7eb' : '#374151',
       borderColor: isDark ? '#374151' : '#e5e7eb',
       backgroundColor: isDark ? '#1f2937' : '#ffffff',
       gridColor: isDark ? '#374151' : '#f3f4f6'
     };
   }
 
-  private updateChartColors() {
-    if (!this.chartOptions) return;
-
-    const colors = this.getThemeColors();
-
-    this.chartOptions.plugins.legend.labels.color = colors.textColor;
-    this.chartOptions.plugins.title.color = colors.textColor;
-    this.chartOptions.scales.x.ticks.color = colors.textMutedColor;
-    this.chartOptions.scales.y.ticks.color = colors.textMutedColor;
-    this.chartOptions.scales.y.grid.color = colors.gridColor;
-
-    // Forzar actualización del gráfico
-    this.chartOptions = { ...this.chartOptions };
-  }
-
   initChart() {
     const colors = this.getThemeColors();
+    this.headerTextColor = colors.textColor;
 
     const allTransactions = this.transacctions();
     const latest20Transactions = allTransactions.slice(-20);
@@ -208,7 +201,7 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
           }
         },
         tooltip: {
-          backgroundColor: this.isDarkMode() ? '#374151' : '#ffffff',
+          backgroundColor: colors.backgroundColor,
           titleColor: colors.textColor,
           bodyColor: colors.textColor,
           borderColor: colors.borderColor,
@@ -222,7 +215,11 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
                 label += ': ';
               }
               if (context.parsed.y !== null) {
-                label += '$' + context.parsed.y.toLocaleString('es-CL');
+                // *** CAMBIO APLICADO AQUÍ PARA TOOLTIP ***
+                return label += '$' + Math.round(context.parsed.y).toLocaleString('es-CL', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                });
               }
               return label;
             },
@@ -270,7 +267,10 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
             },
             callback: function (value: any) {
               if (typeof value === 'number') {
-                return '$' + value.toLocaleString('es-CL');
+                return '$' + Math.round(value).toLocaleString('es-CL', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                });
               }
               return value;
             },
