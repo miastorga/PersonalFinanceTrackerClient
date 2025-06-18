@@ -270,10 +270,19 @@ import { PrimengConfigService } from '../service/primengconfig.service';
         @if (loading == false && paginationService.items().length === 0) {
           <ng-template #emptymessage>
             <tr>
-              <td colspan="6" class="text-center py-8">
-                <div class="flex flex-col items-center gap-3">
-                  <i class="pi pi-arrow-right-arrow-left text-4xl text-gray-400"></i>
-                  <span class="text-gray-500">No se encontraron transacciones.</span>
+              <td colspan="9" class="text-center py-12">
+                <div class="flex flex-col items-center gap-4">
+                  <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                    <i class="pi pi-arrow-right-arrow-left text-2xl text-gray-500 dark:text-gray-300"></i>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
+                      No hay transacciones
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      Tus transacciones aparecerán aquí una vez que las agregues
+                    </p>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -282,7 +291,7 @@ import { PrimengConfigService } from '../service/primengconfig.service';
       </p-table>
 
       <!-- SPINNER DE CARGA -->
-      @if(paginationService.loading() == true){
+      @if(paginationService.loading() == true ){
         <div class="flex justify-center items-center py-8">
           <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #6366f1;"></i>
         </div>
@@ -428,66 +437,77 @@ import { PrimengConfigService } from '../service/primengconfig.service';
               </ng-template>
             </p-dialog>
           <!-- PAGINACIÓN PERSONALIZADA -->
-          <div class="flex justify-between items-center mt-4 p-3 border-t">
-            <div class="flex items-center gap-2">
-              <span class="text-sm text-gray-600">
-                Mostrando {{ paginationService.getStartRecord() }} a {{ paginationService.getEndRecord() }} de {{ paginationService.paginationData().totalCount }} registros
-              </span>
-            </div>
-            
-            <div class="flex items-center gap-2">
-              <!-- Botón Primera Página -->
-              <button
-                pButton
-                icon="pi pi-angle-double-left"
-                class="p-button-text p-button-sm"
-                [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
-                (click)="goToFirstPage()"
-                pTooltip="Primera página">
-              </button>
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 gap-3 sm:gap-0">
+  <!-- Info de registros -->
+  <div class="flex items-center">
+    <span class="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700">
+      <span class="font-medium text-gray-800 dark:text-gray-200">{{ paginationService.getStartRecord() }}-{{ paginationService.getEndRecord() }}</span>
+      de
+      <span class="font-medium text-gray-800 dark:text-gray-200">{{ paginationService.paginationData().totalCount }}</span>
+      registros
+    </span>
+  </div>
 
-              <button
-                pButton
-                icon="pi pi-angle-left"
-                class="p-button-text p-button-sm"
-                [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
-                (click)="goToPreviousPage()"
-                pTooltip="Página anterior">
-              </button>
+  <!-- Controles de paginación -->
+  <div class="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
+    <button
+      pButton
+      icon="pi pi-angle-double-left"
+      class="p-button-text p-button-sm !text-gray-500 dark:!text-gray-400 hover:!text-blue-600 dark:hover:!text-blue-400 hover:!bg-blue-50 dark:hover:!bg-blue-900/20 !border-0 !rounded-md"
+      [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
+      (click)="goToFirstPage()"
+      pTooltip="Primera página">
+    </button>
+    <button
+      pButton
+      icon="pi pi-angle-left"
+      class="p-button-text p-button-sm !text-gray-500 dark:!text-gray-400 hover:!text-blue-600 dark:hover:!text-blue-400 hover:!bg-blue-50 dark:hover:!bg-blue-900/20 !border-0 !rounded-md"
+      [disabled]="!paginationService.paginationData().hasPreviousPage || paginationService.loading()"
+      (click)="goToPreviousPage()"
+      pTooltip="Página anterior">
+    </button>
 
-              <span class="text-sm font-medium text-gray-700 px-3">
-                    Página {{ paginationService.paginationData().currentPage }} de {{ paginationService.paginationData().totalPages }}
-                </span>
+    <div class="flex items-center px-3 py-1 bg-gray-50 dark:bg-gray-700 rounded-md mx-1">
+      <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+        {{ paginationService.paginationData().currentPage }}
+      </span>
+      <span class="text-sm text-gray-500 dark:text-gray-400 mx-1">/</span>
+      <span class="text-sm text-gray-600 dark:text-gray-300">
+        {{ paginationService.paginationData().totalPages }}
+      </span>
+    </div>
 
-              <button
-                pButton
-                icon="pi pi-angle-right"
-                class="p-button-text p-button-sm"
-                [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
-                (click)="goToNextPage()"
-                pTooltip="Página siguiente">
-              </button>
+    <button
+      pButton
+      icon="pi pi-angle-right"
+      class="p-button-text p-button-sm !text-gray-500 dark:!text-gray-400 hover:!text-blue-600 dark:hover:!text-blue-400 hover:!bg-blue-50 dark:hover:!bg-blue-900/20 !border-0 !rounded-md"
+      [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
+      (click)="goToNextPage()"
+      pTooltip="Página siguiente">
+    </button>
+    <button
+      pButton
+      icon="pi pi-angle-double-right"
+      class="p-button-text p-button-sm !text-gray-500 dark:!text-gray-400 hover:!text-blue-600 dark:hover:!text-blue-400 hover:!bg-blue-50 dark:hover:!bg-blue-900/20 !border-0 !rounded-md"
+      [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
+      (click)="goToLastPage()"
+      pTooltip="Última página">
+    </button>
+  </div>
 
-              <button
-                pButton
-                icon="pi pi-angle-double-right"
-                class="p-button-text p-button-sm"
-                [disabled]="!paginationService.paginationData().hasNextPage || paginationService.loading()"
-                (click)="goToLastPage()"
-                pTooltip="Última página">
-              </button>
-            </div>
-            <div class="flex items-center gap-2">
-              <label class="text-sm">Filas por página:</label>
-              <p-select 
-                [options]="paginationService.rowsPerPageOptions"
-                [(ngModel)]="currentPageSize"
-                (onChange)="onRowsPerPageChange($event)"
-                [style]="{'min-width': '80px'}"
-                placeholder="5">
-              </p-select>
-            </div>
-          </div>
+  <!-- Selector de filas por página -->
+  <div class="flex items-center gap-2 bg-white dark:bg-gray-800 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700">
+    <label class="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">Filas:</label>
+    <p-select
+      [options]="paginationService.rowsPerPageOptions"
+      [(ngModel)]="currentPageSize"
+      (onChange)="onRowsPerPageChange($event)"
+      [style]="{'min-width': '70px'}"
+      placeholder="5"
+      styleClass="dark-select compact-select">
+    </p-select>
+  </div>
+</div>
     </div>
     <p-confirmdialog [style]="{ width: '450px' }" />
   `,
@@ -582,10 +602,20 @@ export class TransactionsCRUD implements OnInit {
 
   loadTransactions() {
     this.loading = true;
-    this.paginationService.loadData((page, pageSize) =>
-      this.transactionService.getTransactions({ page, results: pageSize })
+    this.paginationService.loadData(
+      (page, pageSize) => this.transactionService.getTransactions({ page, results: pageSize }),
+      {
+        onError: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: `Error al cargar las transacciones: ${error.message.toLowerCase() || 'Error desconocido'}`
+          });
+        }
+      }
     );
   }
+
 
   getAccountName(transaction: Transaction) {
     return this.accountsSignal().find(a => a.accountId == transaction.accountId)?.accountName

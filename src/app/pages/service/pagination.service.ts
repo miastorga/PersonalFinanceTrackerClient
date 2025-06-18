@@ -85,20 +85,33 @@ export class PaginationService<T> {
   /**
    * Carga datos usando una función de fetch personalizada
    */
-  loadData(fetchFunction: (page: number, pageSize: number) => Observable<PaginationResponse<T>>) {
+  loadData(
+    fetchFunction: (page: number, pageSize: number) => Observable<PaginationResponse<T>>,
+    callbacks?: {
+      onSuccess?: (response: PaginationResponse<T>) => void;
+      onError?: (error: any) => void;
+    }
+  ) {
     this._loading.set(true);
-    this._items.set([]); // Limpiar items durante carga
-
+    this._items.set([]);
     const currentData = this._paginationData();
 
     return fetchFunction(currentData.currentPage, currentData.pageSize).subscribe({
       next: (response) => {
         this.updateFromResponse(response);
         this._loading.set(false);
+
+        if (callbacks?.onSuccess) {
+          callbacks.onSuccess(response);
+        }
       },
       error: (error) => {
         console.error('Error loading data:', error);
         this._loading.set(false);
+
+        if (callbacks?.onError) {
+          callbacks.onError(error);
+        }
       }
     });
   }

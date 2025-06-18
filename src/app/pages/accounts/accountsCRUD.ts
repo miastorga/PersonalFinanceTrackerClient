@@ -217,10 +217,19 @@ import { PrimengConfigService } from '../service/primengconfig.service';
         @if (loading == false && accountsSignal().length === 0) {
           <ng-template #emptymessage>
             <tr>
-              <td colspan="6" class="text-center py-8">
-                <div class="flex flex-col items-center gap-3">
-                  <i class="pi pi-wallet text-4xl text-gray-400"></i>
-                  <span class="text-gray-500">No se encontraron cuentas.</span>
+              <td colspan="7" class="text-center py-12">
+                <div class="flex flex-col items-center gap-4">
+                  <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                    <i class="pi pi-wallet text-2xl text-gray-500 dark:text-gray-300"></i>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
+                      No hay cuentas
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      Comienza agregando tu primera cuenta bancaria
+                    </p>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -367,6 +376,18 @@ import { PrimengConfigService } from '../service/primengconfig.service';
           </div>
         </ng-template>
       </p-dialog>
+
+      <div class="flex justify-between items-center mt-4 p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 bg-white dark:bg-gray-800 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700">
+            <i class="pi pi-tags text-gray-500 dark:text-gray-400"></i>
+            <span class="text-sm text-gray-600 dark:text-gray-300">
+              Total de cuentas:
+              <span class="font-medium text-gray-800 dark:text-gray-200">{{ accountsSignal().length }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <p-confirmdialog [style]="{ width: '450px' }" />
@@ -482,7 +503,7 @@ export class AccountsCRUD implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Error al cargar las cuentas'
+          detail: `Error al cargar las cuentas: ${error.message.toLowerCase() || 'Error desconocido'}`
         });
         this.loading = false;
       }
