@@ -158,10 +158,15 @@ export interface CreateCategory {
           </tr>
         </ng-template>
 
-        @if (loading == false) {
+        @if (loading == false && categoriesSignal().length === 0) {
           <ng-template #emptymessage>
             <tr>
-              <td colspan="4">No se encontraron categorías.</td>
+              <td colspan="6" class="text-center py-8">
+                <div class="flex flex-col items-center gap-3">
+                  <i class="pi pi-tags text-4xl text-gray-400"></i>
+                  <span class="text-gray-500">No se encontraron categorias.</span>
+                </div>
+              </td>
             </tr>
           </ng-template>
         }
@@ -413,14 +418,12 @@ export class CategoriesCRUD implements OnInit {
     }
   }
 
-  // Métodos para eliminar categorías
   deleteCategory(category: Category) {
     this.confirmationService.confirm({
       message: `¿Está seguro de que desea eliminar la categoría "${category.categoryName}"?`,
       header: 'Confirmar Eliminación',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        // Asumiendo que tienes un método removeCategory en tu servicio
         this.categoriesService.removeCategory(category.categoryId).subscribe({
           next: (response) => {
             this.loadCategories();

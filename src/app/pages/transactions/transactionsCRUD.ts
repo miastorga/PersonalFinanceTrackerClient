@@ -267,10 +267,15 @@ import { PrimengConfigService } from '../service/primengconfig.service';
      
         </ng-template>
 
-        @if (paginationService.loading() == false) {
+        @if (loading == false && paginationService.items().length === 0) {
           <ng-template #emptymessage>
             <tr>
-              <td colspan="8">No se encontraron transacciones.</td>
+              <td colspan="6" class="text-center py-8">
+                <div class="flex flex-col items-center gap-3">
+                  <i class="pi pi-arrow-right-arrow-left text-4xl text-gray-400"></i>
+                  <span class="text-gray-500">No se encontraron transacciones.</span>
+                </div>
+              </td>
             </tr>
           </ng-template>
         }

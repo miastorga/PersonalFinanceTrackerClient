@@ -219,7 +219,7 @@ import { PrimengConfigService } from '../service/primengconfig.service';
             <tr>
               <td colspan="6" class="text-center py-8">
                 <div class="flex flex-col items-center gap-3">
-                  <i class="pi pi-credit-card text-4xl text-gray-400"></i>
+                  <i class="pi pi-wallet text-4xl text-gray-400"></i>
                   <span class="text-gray-500">No se encontraron cuentas.</span>
                 </div>
               </td>

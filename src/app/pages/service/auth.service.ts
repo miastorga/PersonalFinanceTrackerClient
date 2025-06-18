@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 interface LoginResponse {
   tokenType: string;
@@ -32,8 +33,7 @@ export interface Errors {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://financetrackerapi.happyisland-59300aa5.brazilsouth.azurecontainerapps.io';
-  // private apiUrl = 'http://localhost:5022'
+  private apiUrl = `${environment.apiUrl}`
 
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();

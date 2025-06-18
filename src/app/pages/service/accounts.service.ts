@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Account {
   accountId: string
@@ -22,8 +23,8 @@ export interface CreateAccount {
 })
 export class AccountsService {
   private http = inject(HttpClient)
-  private URL = "https://financetrackerapi.happyisland-59300aa5.brazilsouth.azurecontainerapps.io/api/v1/Account"
-  // private URL = 'http://localhost:5022/api/v1/Account'
+  private URL = `${environment.apiUrl}/Account`
+
   constructor() { }
 
   getAccounts() {

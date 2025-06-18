@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface QueryParametersSummary {
   startDate?: string | null;
@@ -84,8 +85,7 @@ export interface TransactionResponse {
 })
 export class TransactionsService {
   private http = inject(HttpClient)
-  private URL = "https://financetrackerapi.happyisland-59300aa5.brazilsouth.azurecontainerapps.io/api/v1/Transaction"
-  // private URL = 'http://localhost:5022/api/v1/Transaction'
+  private URL = `${environment.apiUrl}/Transaction`
   constructor() { }
 
   getSummary(params?: QueryParametersSummary) {
