@@ -104,14 +104,13 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
     this.headerTextColor = colors.textColor;
 
     const allTransactions = this.transacctions();
-    const latest20Transactions = allTransactions.slice(-20);
 
     const accountExpenseAmounts: { [key: string]: number } = {};
     const accountIncomeAmounts: { [key: string]: number } = {};
     this.accountTypeCounts = {};
 
     const uniqueAccountNames = new Set<string>();
-    latest20Transactions.forEach((transaction) => {
+    allTransactions.forEach((transaction) => {
       const accountDisplayName = transaction.accountName || 'Sin Nombre de Cuenta';
       uniqueAccountNames.add(accountDisplayName);
     });
@@ -122,7 +121,7 @@ export class AccountSummaryChartComponent implements OnInit, OnDestroy {
       this.accountTypeCounts[name] = { gastos: 0, ingresos: 0 };
     });
 
-    latest20Transactions.forEach((transaction) => {
+    allTransactions.forEach((transaction) => {
       const accountDisplayName = transaction.accountName || 'Sin Nombre de Cuenta';
 
       if (transaction.transactionType === 'gasto') {
