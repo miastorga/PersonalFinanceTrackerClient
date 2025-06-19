@@ -316,14 +316,13 @@ import { PrimengConfigService } from '../service/primengconfig.service';
                         id="amount"
                         formControlName="amount"
                         mode="decimal"
-                        [useGrouping]="false"
-                        [minFractionDigits]="0"
-                        [maxFractionDigits]="2"
-                        placeholder="0"
+                        [useGrouping]="true"
+                        placeholder="0.00"
+                        prefix="$"
                         class="w-full">
                       </p-inputNumber>
                       <small class="text-red-500" *ngIf="transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched">
-                        El monto es requerido
+                        {{ getAmountErrorMessage() }}
                       </small>
                     </div>
 
@@ -337,9 +336,9 @@ import { PrimengConfigService } from '../service/primengconfig.service';
                         formControlName="description"
                         placeholder="Ingrese una descripción"
                         class="w-full">
-                      <small class="text-red-500" *ngIf="transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched">
-                        La descripción es requerida
-                      </small>
+                        <small class="text-red-500" *ngIf="transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched">
+                          {{ getDescriptionErrorMessage() }}
+                        </small>
                     </div>
 
                     <!-- Fecha -->
@@ -591,7 +590,7 @@ export class TransactionsCRUD implements OnInit {
 
   initializeForm() {
     this.transactionForm = this.fb.group({
-      amount: [null, [Validators.required, Validators.min(1), Validators.max(1000000000)]],
+      amount: [0, [Validators.required, Validators.min(1), Validators.max(1000000000)]],
       description: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(500)]],
       date: [new Date(), Validators.required],
       transactionType: ['', Validators.required],
@@ -616,6 +615,39 @@ export class TransactionsCRUD implements OnInit {
     );
   }
 
+  getAmountErrorMessage(): string {
+    const control = this.transactionForm.get('amount');
+
+    // Prioridad: required > min > max
+    if (control?.errors?.['required']) {
+      return 'El monto es requerido';
+    }
+    if (control?.errors?.['min']) {
+      return 'El monto debe ser mayor a 0';
+    }
+    if (control?.errors?.['max']) {
+      return 'El monto no puede superar los 1,000,000,000';
+    }
+
+    return '';
+  }
+
+  getDescriptionErrorMessage(): string {
+    const control = this.transactionForm.get('description');
+
+    // Prioridad: required > minlength > maxlength
+    if (control?.errors?.['required']) {
+      return 'La descripción es requerida';
+    }
+    if (control?.errors?.['minlength']) {
+      return 'La descripción debe tener al menos 3 caracteres';
+    }
+    if (control?.errors?.['maxlength']) {
+      return 'La descripción no puede superar los 500 caracteres';
+    }
+
+    return '';
+  }
 
   getAccountName(transaction: Transaction) {
     return this.accountsSignal().find(a => a.accountId == transaction.accountId)?.accountName

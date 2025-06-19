@@ -270,15 +270,7 @@ import { PrimengConfigService } from '../service/primengconfig.service';
                   class="w-full"
                   [maxlength]="100">
                 <small class="text-red-500" *ngIf="accountForm.get('accountName')?.invalid && accountForm.get('accountName')?.touched">
-                  <span *ngIf="accountForm.get('accountName')?.errors?.['required']">
-                    El nombre de la cuenta es requerido
-                  </span>
-                  <span *ngIf="accountForm.get('accountName')?.errors?.['minlength']">
-                    El nombre debe tener al menos 2 caracteres
-                  </span>
-                  <span *ngIf="accountForm.get('accountName')?.errors?.['maxlength']">
-                    El nombre no debe exceder 100 caracteres
-                  </span>
+                  {{getNameErrorMessage()}} 
                 </small>
               </div>
 
@@ -491,6 +483,23 @@ export class AccountsCRUD implements OnInit {
       }
     });
   }
+
+  getNameErrorMessage(): string {
+    const control = this.accountForm.get('accountName');
+
+    if (control?.errors?.['required']) {
+      return 'La cuenta es requerida';
+    }
+    if (control?.errors?.['minlength']) {
+      return 'La cuenta debe tener al menos 3 caracteres';
+    }
+    if (control?.errors?.['maxlength']) {
+      return 'La cuenta no puede superar los 100 caracteres';
+    }
+
+    return '';
+  }
+
 
   loadAccounts() {
     this.loading = true;
