@@ -14,7 +14,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, map, of } from 'rxjs';
 import { CategoriesService, Category } from '../service/categories.service';
 import { PrimengConfigService } from '../service/primengconfig.service';
 
@@ -316,12 +316,14 @@ export class CategoriesCRUD implements OnInit {
         this.loading = false;
       },
       error: (error) => {
+        console.log(error)
+        console.log(this.categoriesSignal())
+        this.loading = false;
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: `Error al cargar las categorías: ${error.message.toLowerCase() || 'Error desconocido'}`
+          detail: `${error} Vuelva a intentarlo mas tarde`
         });
-        this.loading = false;
       }
     });
   }
@@ -446,10 +448,11 @@ export class CategoriesCRUD implements OnInit {
             });
           },
           error: (error) => {
+            console.log(error)
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: `Error al eliminar la categoría: Comprueba que no exista ninguna transacción con esta categoria`
+              detail: `${error}`
             });
           }
         });
@@ -464,16 +467,33 @@ export class CategoriesCRUD implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         const deleteObservables = this.selectedCategories?.map(category =>
-          this.categoriesService.removeCategory(category.categoryId)
+          this.categoriesService.removeCategory(category.categoryId).pipe(
+            map(response => ({ success: true, category, response })),
+            catchError(error => of({ success: false, category, error }))
+          )
         );
 
         forkJoin(deleteObservables!).subscribe({
-          next: (responses) => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: `${this.selectedCategories?.length} categorías eliminadas exitosamente`
-            });
+          next: (results) => {
+            const successful = results.filter(r => r.success);
+            const failed = results.filter(r => !r.success);
+
+            if (successful.length > 0) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Éxito',
+                detail: `${successful.length} categorías eliminadas exitosamente`
+              });
+            }
+
+            if (failed.length > 0) {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: `${failed.length} categorías no pudieron ser eliminadas`
+              });
+            }
+
             this.selectedCategories = [];
             this.loadCategories();
           },
@@ -481,7 +501,7 @@ export class CategoriesCRUD implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: `Error al eliminar algunas categorías: ${error.message}`
+              detail: 'Error inesperado al procesar las eliminaciones'
             });
             this.selectedCategories = [];
             this.loadCategories();

@@ -59,6 +59,9 @@ export class CategoriesService {
   /**
    * Maneja errores HTTP
    */
+  /**
+   * Maneja errores HTTP
+   */
   private handleError = (error: HttpErrorResponse): Observable<never> => {
     let errorMessage = 'Error desconocido';
 
@@ -67,25 +70,44 @@ export class CategoriesService {
       errorMessage = `Error: ${error.error.message}`;
     } else {
       // Error del lado del servidor
-      switch (error.status) {
-        case 400:
-          errorMessage = 'Solicitud inválida. Verifica los parámetros.';
-          break;
-        case 401:
-          errorMessage = 'No autorizado. Verifica tus credenciales.';
-          break;
-        case 404:
-          errorMessage = 'Recurso no encontrado.';
-          break;
-        case 500:
-          errorMessage = 'Error interno del servidor.';
-          break;
-        default:
-          errorMessage = `Error ${error.status}: ${error.message}`;
+      // Intentar extraer el mensaje del ProblemDetails
+      if (error.error && typeof error.error === 'object') {
+        const problemDetails = error.error;
+
+        // Usar el detail del ProblemDetails si está disponible
+        if (problemDetails.detail) {
+          errorMessage = problemDetails.detail;
+        } else if (problemDetails.title) {
+          errorMessage = problemDetails.title;
+        } else {
+          // Fallback a mensajes por código de estado
+          errorMessage = this.getDefaultErrorMessage(error.status);
+        }
+      } else {
+        // Fallback a mensajes por código de estado
+        errorMessage = this.getDefaultErrorMessage(error.status);
       }
     }
 
-    console.error('Error en TransactionsService:', error);
-    return throwError(() => new Error(errorMessage));
+    console.log(errorMessage)
+    return throwError(() => (errorMessage));
+  }
+
+  /**
+   * Obtiene mensaje de error por defecto basado en el código de estado
+   */
+  private getDefaultErrorMessage(status: number): string {
+    switch (status) {
+      case 400:
+        return 'Solicitud inválida. Verifica los parámetros.';
+      case 401:
+        return 'No autorizado. Verifica tus credenciales.';
+      case 404:
+        return 'Recurso no encontrado.';
+      case 500:
+        return 'Error interno del servidor.';
+      default:
+        return `Error ${status}: Error del servidor`;
+    }
   }
 }
