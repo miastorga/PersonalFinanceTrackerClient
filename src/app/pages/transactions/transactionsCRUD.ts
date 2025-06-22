@@ -62,25 +62,32 @@ import { PrimengConfigService } from '../service/primengconfig.service';
     ToggleButtonModule
   ],
   template: `
+  <div class="header-section p-4 mb-4 surface-card border-round shadow-2" style="background: var(--surface-card); border: 1px solid var(--surface-border);">
+    <div class="header-content flex justify-content-between align-items-center mb-3">
+      <h1 class="title text-color m-0 flex align-items-center">
+        <i class="pi pi-arrow-right-arrow-left text-primary mr-3" style="font-size: 1.5rem; vertical-align: middle;"></i>
+        Gestión de Transacciones
+      </h1>
+      <div class="flex gap-2 ml-auto">
+        <p-button
+          label="Nueva Cuenta"
+          icon="pi pi-plus"
+          (click)="showAddTransactionDialog()"
+          severity="success"
+          class="p-button-raised">
+        </p-button>
+        <p-button
+          severity="danger"
+          label="Eliminar Seleccionadas"
+          icon="pi pi-trash"
+          outlined
+          (onClick)="deleteSelectedTransactions()"
+          [disabled]="!selectedTransactions || selectedTransactions.length === 0">
+        </p-button>
+      </div>
+    </div>
+  </div>
     <div class="card">
-      <p-toolbar styleClass="mb-6">
-        <ng-template #start>
-          <p-button 
-            label="Nueva Transacción" 
-            icon="pi pi-plus" 
-            severity="primary" 
-            class="mr-2" 
-            (onClick)="showAddTransactionDialog()" />
-            <p-button
-            severity="danger"
-            label="Eliminar Seleccionadas"
-            icon="pi pi-trash"
-            outlined
-            (onClick)="deleteSelectedTransactions()"
-            [disabled]="!selectedTransactions || selectedTransactions.length === 0" />
-        </ng-template>
-
-      </p-toolbar>
           <p-toast
             position="top-right"
             [baseZIndex]="5000"
@@ -267,27 +274,27 @@ import { PrimengConfigService } from '../service/primengconfig.service';
      
         </ng-template>
 
-        @if (loading == false && paginationService.items().length === 0) {
-          <ng-template #emptymessage>
-            <tr>
-              <td colspan="9" class="text-center py-12">
-                <div class="flex flex-col items-center gap-4">
-                  <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                    <i class="pi pi-arrow-right-arrow-left text-2xl text-gray-500 dark:text-gray-300"></i>
-                  </div>
-                  <div class="text-center">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
-                      No hay transacciones
-                    </h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      Tus transacciones aparecerán aquí una vez que las agregues
-                    </p>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        }
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="9" class="text-center py-12">
+              <div *ngIf="paginationService.items().length === 0 && loading == false"
+                class="empty-state text-center surface-card border-round shadow-1 p-6">
+                  <i class="pi pi-arrow-right-arrow-left text-8xl text-color-secondary mb-4 block" style="font-size: 40px;"></i>
+                  <h3 class="text-color font-bold mb-2">No hay transacciones registradas</h3>
+                  <p class="text-color-secondary mb-4 line-height-3">
+                    Crea tu primera transaccion para comenzar a gestionar tus finanzas personales
+                  </p>
+                  <p-button
+                    label="Nueva Transaccion"
+                    icon="pi pi-plus"
+                    [outlined]="true"
+                    severity="success"
+                    (click)="showAddTransactionDialog()">
+                  </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
       </p-table>
 
       <!-- SPINNER DE CARGA -->
@@ -511,6 +518,62 @@ import { PrimengConfigService } from '../service/primengconfig.service';
     <p-confirmdialog [style]="{ width: '450px' }" />
   `,
   styles: `
+    .header-section {
+  margin-bottom: 2rem;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+}
+     .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-color-secondary);
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      color: var(--text-color-secondary);
+    }
+
+    .empty-state h3 {
+      color: var(--text-color);
+      margin-bottom: 1rem;
+    }
     .p-datatable-frozen-tbody {
       font-weight: bold;
     }

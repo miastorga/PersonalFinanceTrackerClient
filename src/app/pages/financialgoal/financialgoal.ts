@@ -78,7 +78,7 @@ export interface Category {
   <div class="header-section p-4 mb-4 surface-ground border-round">
     <div class="header-content flex justify-content-between align-items-center mb-3">
       <h1 class="title text-color m-0 flex align-items-center">
-        <i class="pi pi-bullseye text-primary mr-3"></i>
+        <i class="pi pi-bullseye text-primary mr-3" style="font-size: 1.5rem;"></i>
         Metas Financieras
       </h1>
       <p-button
