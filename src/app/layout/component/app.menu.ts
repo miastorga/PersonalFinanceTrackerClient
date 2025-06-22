@@ -28,7 +28,8 @@ export class AppMenu {
         label: 'Finanzas', items: [
           { label: 'Transacciones', icon: 'pi pi-fw pi-arrow-right-arrow-left', routerLink: ['/pages/transacciones'] },
           { label: 'Categorias', icon: 'pi pi-fw pi-tags', routerLink: ['/pages/categorias'] },
-          { label: 'Cuentas', icon: 'pi pi-fw pi-wallet', routerLink: ['/pages/cuentas'] }
+          { label: 'Cuentas', icon: 'pi pi-fw pi-wallet', routerLink: ['/pages/cuentas'] },
+          { label: 'Metas', icon: 'pi pi-fw pi-bullseye', routerLink: ['/pages/metas'] }
         ]
       }
     ];

@@ -7,12 +7,14 @@ import { TransactionsCRUD } from './transactions/transactionsCRUD';
 import { CategoriesCRUD } from './categories/categoriesCRUD';
 import { AccountsCRUD } from './accounts/accountsCRUD';
 import { Register } from './auth/register';
+import { FinancialGoalsComponent } from './financialgoal/financialgoal';
 
 export default [
   { path: '', component: Dashboard, canActivate: [AuthGuard] },
   { path: 'transacciones', component: TransactionsCRUD, canActivate: [AuthGuard] },
   { path: 'categorias', component: CategoriesCRUD, canActivate: [AuthGuard] },
   { path: 'cuentas', component: AccountsCRUD, canActivate: [AuthGuard] },
+  { path: 'metas', component: FinancialGoalsComponent, canActivate: [AuthGuard] },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   { path: '**', redirectTo: '/notfound' }
