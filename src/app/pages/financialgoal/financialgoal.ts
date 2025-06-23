@@ -430,6 +430,7 @@ import { PaginationService } from '../service/pagination.service';
           formControlName="status"
           optionLabel="label"
           optionValue="value"
+          [appendTo]="'body'"
           placeholder="Seleccionar estado"
           class="w-full">
         </p-dropdown>
