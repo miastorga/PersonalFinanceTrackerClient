@@ -1,5 +1,5 @@
 // Angular Core
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -19,29 +19,9 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
-
-export interface FinancialGoal {
-  financialGoalId: string;
-  userId: string;
-  name: string;
-  description: string;
-  status: 'activa' | 'completada' | 'pausada' | 'cancelada';
-  priority: 'alta' | 'media' | 'baja';
-  createAt: Date;
-  categoryId: string;
-  categoryName?: string;
-  goalAmount: number;
-  currentAmount: number;
-  targetDate: Date;
-  progressPercentage?: number;
-  daysRemaining?: number;
-  isCompleted?: boolean;
-}
-
-export interface Category {
-  categoryId: string;
-  name: string;
-}
+import { CategoriesService, Category } from '../service/categories.service';
+import { CreateFinancialGoal, FinancialGoal, FinancialGoalService } from '../service/financialgoal.service';
+import { PaginationService } from '../service/pagination.service';
 
 @Component({
   standalone: true,
@@ -155,7 +135,7 @@ export interface Category {
                 class="text-sm">
               </p-tag>
               <p-tag
-                [value]="goal.categoryName"
+                [value]="getCategoryName(goal.categoryId)"
                 severity="info"
                 class="text-sm">
               </p-tag>
@@ -205,10 +185,10 @@ export interface Category {
 
           <div class="progress-amounts flex justify-content-between">
             <span class="current-amount text-color font-medium">
-              {{ goal.currentAmount | number }}
+              {{ goal.currentAmount | currency:'COP':'symbol':'1.0-0' }}
             </span>
             <span class="goal-amount text-color-secondary">
-              {{ goal.goalAmount | number }}
+              {{ goal.goalAmount | currency:'COP':'symbol':'1.0-0' }}
             </span>
           </div>
         </div>
@@ -219,12 +199,12 @@ export interface Category {
             <i class="pi pi-calendar text-color-secondary"></i>
             <span class="text-color">{{goal.targetDate | date:'dd/MM/yyyy'}}</span>
           </div>
-          <div class="time-item flex align-items-center gap-2" 
+          <div class="time-item flex align-items-center gap-2"
                [ngClass]="{'overdue': goal.isCompleted}">
-            <i class="pi pi-clock" 
+            <i class="pi pi-clock"
                [ngClass]="goal.isCompleted ? 'text-red-500' : 'text-color-secondary'"></i>
             <span [ngClass]="goal.isCompleted ? 'text-red-500' : 'text-color'">
-              {{goal.isCompleted ? 'Vencida hace ' + Math.abs(goal.daysRemaining!) + ' días' : 
+              {{goal.isCompleted ? 'Vencida hace ' + Math.abs(goal.daysRemaining!) + ' días' :
                 goal.daysRemaining + ' días restantes'}}
             </span>
           </div>
@@ -234,19 +214,19 @@ export interface Category {
         <div class="quick-update surface-50 border-round p-3">
           <label class="block text-color font-medium mb-2">Actualizar monto:</label>
           <div class="update-controls flex gap-2 align-items-center">
-            <p-inputNumber 
+            <p-inputNumber
               [(ngModel)]="goal.currentAmount"
-              mode="currency" 
-              currency="COP" 
+              mode="currency"
+              currency="COP"
               locale="es-CO"
-              [min]="0" 
+              [min]="0"
               [max]="goal.goalAmount"
               size="small"
               (onBlur)="updateProgress(goal)"
               class="flex-1">
             </p-inputNumber>
-            <p-button 
-              icon="pi pi-check" 
+            <p-button
+              icon="pi pi-check"
               size="small"
               [outlined]="true"
               severity="success"
@@ -261,16 +241,16 @@ export interface Category {
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="filteredGoals.length === 0" 
+  <div *ngIf="filteredGoals.length === 0"
        class="empty-state text-center surface-card border-round shadow-1 p-6">
     <i class="pi pi-inbox text-6xl text-color-secondary mb-4 block"></i>
     <h3 class="text-color font-bold mb-2">No hay metas financieras</h3>
     <p class="text-color-secondary mb-4 line-height-3">
       Crea tu primera meta para comenzar a ahorrar y alcanzar tus objetivos financieros
     </p>
-    <p-button 
-      label="Crear Meta" 
-      icon="pi pi-plus" 
+    <p-button
+      label="Crear Meta"
+      icon="pi pi-plus"
       [outlined]="true"
       severity="success"
       (click)="openNew()">
@@ -305,7 +285,7 @@ export interface Category {
           placeholder="Ingrese el nombre de la meta"
           class="w-full p-inputtext"
           [class.p-invalid]="goalForm.get('goalName')?.invalid && goalForm.get('goalName')?.touched">
-        <small class="p-error block mt-1" 
+        <small class="p-error block mt-1"
                *ngIf="goalForm.get('goalName')?.invalid && goalForm.get('goalName')?.touched">
           <span *ngIf="goalForm.get('goalName')?.errors?.['required']">
             El nombre de la meta es requerido
@@ -339,15 +319,15 @@ export interface Category {
           </label>
           <p-dropdown
             id="category"
-            [options]="categories"
+            [options]="categoriesSignal()"
             formControlName="categoryId"
-            optionLabel="name"
+            optionLabel="categoryName"
             optionValue="categoryId"
             placeholder="Seleccionar categoría"
             class="w-full"
             [class.p-invalid]="goalForm.get('categoryId')?.invalid && goalForm.get('categoryId')?.touched">
           </p-dropdown>
-          <small class="p-error block mt-1" 
+          <small class="p-error block mt-1"
                  *ngIf="goalForm.get('categoryId')?.invalid && goalForm.get('categoryId')?.touched">
             La categoría es requerida
           </small>
@@ -386,7 +366,7 @@ export interface Category {
             class="w-full"
             [class.p-invalid]="goalForm.get('goalAmount')?.invalid && goalForm.get('goalAmount')?.touched">
           </p-inputNumber>
-          <small class="p-error block mt-1" 
+          <small class="p-error block mt-1"
                  *ngIf="goalForm.get('goalAmount')?.invalid && goalForm.get('goalAmount')?.touched">
             <span *ngIf="goalForm.get('goalAmount')?.errors?.['required']">
               El monto meta es requerido
@@ -412,7 +392,7 @@ export interface Category {
             class="w-full"
             [class.p-invalid]="goalForm.get('currentAmount')?.invalid && goalForm.get('currentAmount')?.touched">
           </p-inputNumber>
-          <small class="p-error block mt-1" 
+          <small class="p-error block mt-1"
                  *ngIf="goalForm.get('currentAmount')?.invalid && goalForm.get('currentAmount')?.touched">
             El monto actual no puede ser negativo
           </small>
@@ -433,7 +413,7 @@ export interface Category {
           class="w-full"
           [class.p-invalid]="goalForm.get('targetDate')?.invalid && goalForm.get('targetDate')?.touched">
         </p-calendar>
-        <small class="p-error block mt-1" 
+        <small class="p-error block mt-1"
                *ngIf="goalForm.get('targetDate')?.invalid && goalForm.get('targetDate')?.touched">
           La fecha objetivo es requerida
         </small>
@@ -883,7 +863,8 @@ export interface Category {
 export class FinancialGoalsComponent implements OnInit {
   goals: FinancialGoal[] = [];
   savingGoal = false;
-  categories: Category[] = [];
+  categoriesSignal = signal<Category[]>([]);
+  financialGoalService = inject(FinancialGoalService);
 
   goalDialog = false;
   goal: FinancialGoal = this.getEmptyGoal();
@@ -911,12 +892,17 @@ export class FinancialGoalsComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private categoryService: CategoriesService
   ) { }
 
   ngOnInit() {
     this.loadGoals();
     this.loadCategories();
+    this.initializeForm();
+  }
+
+  initializeForm() {
     this.goalForm = this.fb.group({
       goalName: ['', [Validators.required, Validators.minLength(3)]],
       description: [''],
@@ -930,62 +916,34 @@ export class FinancialGoalsComponent implements OnInit {
   }
 
   loadGoals() {
-    this.goals = [
-      {
-        financialGoalId: '1',
-        userId: 'user1',
-        name: 'Vacaciones Europa',
-        description: 'Ahorro para viaje de 15 días por Europa',
-        status: 'activa',
-        priority: 'alta',
-        createAt: new Date('2024-01-15'),
-        categoryId: '1',
-        categoryName: 'Viajes',
-        goalAmount: 3000000,
-        currentAmount: 1800000,
-        targetDate: new Date('2025-06-15')
+    this.financialGoalService.getFinancialGoals({ page: 1, results: 100 }).subscribe({
+      next: (response) => {
+        this.goals = response.items;
+        this.processGoalsData();
       },
-      {
-        financialGoalId: '2',
-        userId: 'user1',
-        name: 'Fondo Emergencia',
-        description: 'Fondo de emergencia equivalente a 6 meses de gastos',
-        status: 'activa',
-        priority: 'alta',
-        createAt: new Date('2024-03-01'),
-        categoryId: '2',
-        categoryName: 'Emergencia',
-        goalAmount: 5000000,
-        currentAmount: 2500000,
-        targetDate: new Date('2025-12-31')
-      },
-      {
-        financialGoalId: '3',
-        userId: 'user1',
-        name: 'Laptop Nueva',
-        description: 'MacBook Pro para trabajo',
-        status: 'completada',
-        priority: 'media',
-        createAt: new Date('2024-02-01'),
-        categoryId: '3',
-        categoryName: 'Tecnología',
-        goalAmount: 2500000,
-        currentAmount: 2500000,
-        targetDate: new Date('2024-12-31')
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: `Error al cargar las metas: ${error.message || 'Error desconocido'}`
+        });
       }
-    ];
-
-    this.processGoalsData();
+    });
   }
 
   loadCategories() {
-    this.categories = [
-      { categoryId: '1', name: 'Viajes' },
-      { categoryId: '2', name: 'Emergencia' },
-      { categoryId: '3', name: 'Tecnología' },
-      { categoryId: '4', name: 'Educación' },
-      { categoryId: '5', name: 'Hogar' }
-    ];
+    this.categoryService.getCategories().subscribe({
+      next: (res) => {
+        this.categoriesSignal.set(res);
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al cargar las categorías'
+        });
+      }
+    });
   }
 
   processGoalsData() {
@@ -1002,28 +960,52 @@ export class FinancialGoalsComponent implements OnInit {
   getEmptyGoal(): FinancialGoal {
     return {
       financialGoalId: '',
-      userId: '',
       name: '',
       description: '',
       status: 'activa',
       priority: 'media',
-      createAt: new Date(),
+      createAt: '',
       categoryId: '',
       goalAmount: 0,
       currentAmount: 0,
-      targetDate: new Date()
+      targetDate: '',
+      progressPercentage: 0,
+      isCompleted: false,
+      daysRemaining: 0
     };
   }
 
   openNew() {
     this.goal = this.getEmptyGoal();
     this.isEditMode = false;
+    this.goalForm.reset({
+      goalName: '',
+      description: '',
+      categoryId: '',
+      priority: 'media',
+      goalAmount: 0,
+      currentAmount: 0,
+      targetDate: '',
+      status: 'activa'
+    });
     this.goalDialog = true;
   }
 
   editGoal(goal: FinancialGoal) {
     this.goal = { ...goal };
     this.isEditMode = true;
+
+    this.goalForm.patchValue({
+      goalName: goal.name,
+      description: goal.description,
+      categoryId: goal.categoryId,
+      priority: goal.priority,
+      goalAmount: goal.goalAmount,
+      currentAmount: goal.currentAmount,
+      targetDate: new Date(goal.targetDate),
+      status: goal.status
+    });
+
     this.goalDialog = true;
   }
 
@@ -1033,59 +1015,135 @@ export class FinancialGoalsComponent implements OnInit {
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.goals = this.goals.filter(g => g.financialGoalId !== goal.financialGoalId);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Eliminado',
-          detail: 'Meta eliminada correctamente'
+        this.financialGoalService.removeFinancialGoal(goal.financialGoalId).subscribe({
+          next: () => {
+            this.goals = this.goals.filter(g => g.financialGoalId !== goal.financialGoalId);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Eliminado',
+              detail: 'Meta eliminada correctamente'
+            });
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Error al eliminar la meta'
+            });
+          }
         });
       }
     });
   }
 
   saveGoal() {
-    // Buscar el nombre de la categoría
-    const category = this.categories.find(c => c.categoryId === this.goal.categoryId);
-    if (category) {
-      this.goal.categoryName = category.name;
+    if (this.goalForm.invalid) {
+      Object.keys(this.goalForm.controls).forEach(key => {
+        this.goalForm.get(key)?.markAsTouched();
+      });
+      return;
     }
+
+    this.savingGoal = true;
+    const formValue = this.goalForm.value;
+
+    const goalData: CreateFinancialGoal = {
+      name: formValue.goalName,
+      description: formValue.description,
+      categoryId: formValue.categoryId,
+      priority: formValue.priority,
+      goalAmount: formValue.goalAmount,
+      currentAmount: formValue.currentAmount,
+      targetDate: formValue.targetDate.toISOString(),
+      status: formValue.status,
+      createAt: new Date().toISOString()
+    };
 
     if (this.isEditMode) {
-      const index = this.goals.findIndex(g => g.financialGoalId === this.goal.financialGoalId);
-      if (index !== -1) {
-        this.goals[index] = { ...this.goal };
-      }
+      this.financialGoalService.updateFinancialGoal(this.goal.financialGoalId, goalData).subscribe({
+        next: () => {
+          this.loadGoals();
+          this.goalDialog = false;
+          this.savingGoal = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Actualizado',
+            detail: 'Meta actualizada correctamente'
+          });
+        },
+        error: (error) => {
+          this.savingGoal = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error al actualizar la meta'
+          });
+        }
+      });
     } else {
-      this.goal.financialGoalId = Date.now().toString();
-      this.goal.userId = 'user1';
-      this.goals.push({ ...this.goal });
+      this.financialGoalService.createFinancialGoal(goalData).subscribe({
+        next: () => {
+          this.loadGoals();
+          this.goalDialog = false;
+          this.savingGoal = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Guardado',
+            detail: 'Meta creada correctamente'
+          });
+        },
+        error: (error) => {
+          this.savingGoal = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error al crear la meta'
+          });
+        }
+      });
     }
-
-    this.processGoalsData();
-    this.goalDialog = false;
-
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Guardado',
-      detail: `Meta ${this.isEditMode ? 'actualizada' : 'creada'} correctamente`
-    });
   }
 
   hideDialog() {
     this.goalDialog = false;
+    this.goalForm.reset();
   }
 
   updateProgress(goal: FinancialGoal) {
-    if (goal.currentAmount >= goal.goalAmount) {
-      goal.status = 'completada';
-    }
-    this.processGoalsData();
+    const updateData: CreateFinancialGoal = {
+      name: goal.name,
+      description: goal.description,
+      categoryId: goal.categoryId,
+      priority: goal.priority,
+      goalAmount: goal.goalAmount,
+      currentAmount: goal.currentAmount,
+      targetDate: goal.targetDate,
+      status: goal.currentAmount >= goal.goalAmount ? 'completada' : goal.status,
+      createAt: goal.createAt
+    };
 
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Actualizado',
-      detail: `Progreso actualizado para ${goal.name}`
+    this.financialGoalService.updateFinancialGoal(goal.financialGoalId, updateData).subscribe({
+      next: () => {
+        this.processGoalsData();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Actualizado',
+          detail: `Progreso actualizado para ${goal.name}`
+        });
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al actualizar el progreso'
+        });
+      }
     });
+  }
+
+  getCategoryName(categoryId: string): string {
+    const category = this.categoriesSignal().find(c => c.categoryId === categoryId);
+    return category ? category.categoryName : categoryId;
   }
 
   getStatusSeverity(status: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' | undefined {

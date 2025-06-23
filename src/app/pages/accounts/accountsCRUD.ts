@@ -93,7 +93,6 @@ import { PrimengConfigService } from '../service/primengconfig.service';
     >
       <ng-template #caption>
         <div class="flex justify-between items-center flex-column sm:flex-row">
-          <h5 class="m-0">Gestión de Cuentas</h5>
           <div class="flex gap-2">
             <button pButton label="Limpiar" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
             <!-- <p-iconfield iconPosition="left" class="ml-auto">

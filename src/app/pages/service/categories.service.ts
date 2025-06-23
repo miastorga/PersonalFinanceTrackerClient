@@ -37,13 +37,6 @@ export class CategoriesService {
     )
   }
 
-  removeTransaction(id: string) {
-    console.log(id)
-    return this.http.delete<void>(`${this.URL}/${id}`).pipe(
-      catchError(this.handleError)
-    )
-  }
-
   updateCategory(id: string, params: CreateCategory) {
 
     return this.http.put<CreateCategory>(`${this.URL}/${id}`, { name: params["categoryName"] }).pipe(

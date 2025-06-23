@@ -111,7 +111,6 @@ import { PrimengConfigService } from '../service/primengconfig.service';
       >
         <ng-template #caption>
           <div class="flex justify-between items-center flex-column sm:flex-row">
-            <h5 class="m-0">Gestión de Transacciones</h5>
             <div class="flex gap-2">
               <button pButton label="Limpiar" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
               <!-- <p-iconfield iconPosition="left" class="ml-auto">
@@ -560,7 +559,7 @@ import { PrimengConfigService } from '../service/primengconfig.service';
       padding: 4rem 2rem;
       color: var(--text-color-secondary);
       background: var(--surface-card);
-      border: 1px solid var(--surface-border);
+      // border: 1px solid var(--surface-border);
       border-radius: 12px;
     }
 
