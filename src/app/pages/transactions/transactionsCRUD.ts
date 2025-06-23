@@ -276,7 +276,7 @@ import { PrimengConfigService } from '../service/primengconfig.service';
         <ng-template #emptymessage>
           <tr>
             <td colspan="9" class="text-center py-12">
-              <div *ngIf="paginationService.items().length === 0 && loading == false"
+              <div *ngIf="paginationService.items().length === 0 && !paginationService.loading()"
                 class="empty-state text-center surface-card border-round shadow-1 p-6">
                   <i class="pi pi-arrow-right-arrow-left text-8xl text-color-secondary mb-4 block" style="font-size: 40px;"></i>
                   <h3 class="text-color font-bold mb-2">No hay transacciones registradas</h3>
@@ -600,7 +600,6 @@ export class TransactionsCRUD implements OnInit {
   primengConfig = inject(PrimengConfigService)
 
 
-  loading: boolean = false;
   editMode: boolean = false;
   currentTransactionId: string | null = null;
 
@@ -662,7 +661,6 @@ export class TransactionsCRUD implements OnInit {
   }
 
   loadTransactions() {
-    this.loading = true;
     this.paginationService.loadData(
       (page, pageSize) => this.transactionService.getTransactions({ page, results: pageSize }),
       {
@@ -716,31 +714,23 @@ export class TransactionsCRUD implements OnInit {
   }
 
   loadCategories() {
-    this.loading = true;
     this.categoriesService.getCategories().subscribe({
       next: (response: Category[]) => {
 
         this.categoriesSignal.set(response)
-
-        this.loading = false;
       },
       error: (error) => {
-        this.loading = false;
       }
     })
   }
 
   loadAccounts() {
-    this.loading = true
     this.accountService.getAccounts().subscribe({
       next: (response: Account[]) => {
 
         this.accountsSignal.set(response)
-
-        this.loading = false;
       },
       error: (error) => {
-        this.loading = false;
       }
     })
   }

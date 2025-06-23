@@ -223,7 +223,7 @@ import { PrimengConfigService } from '../service/primengconfig.service';
       <ng-template #emptymessage>
         <tr>
           <td colspan="7" class="text-center py-12">
-            <div *ngIf="accountsSignal().length === 0 && loading == false"
+            <div *ngIf="accountsSignal().length === 0 && !loading"
               class="empty-state text-center surface-card border-round shadow-1 p-6">
                 <i class="pi pi-wallet text-8xl text-color-secondary mb-4 block" style="font-size: 40px;"></i>
                 <h3 class="text-color font-bold mb-2">No hay cuentas registradas</h3>
@@ -245,7 +245,7 @@ import { PrimengConfigService } from '../service/primengconfig.service';
     </p-table>
 
     <!-- SPINNER DE CARGA -->
-    @if(loading == true){
+    @if(loading){
       <div class="flex justify-center items-center py-8">
         <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #6366f1;"></i>
       </div>
