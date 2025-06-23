@@ -22,10 +22,13 @@ import { TooltipModule } from 'primeng/tooltip';
 import { CategoriesService, Category } from '../service/categories.service';
 import { CreateFinancialGoal, FinancialGoal, FinancialGoalService } from '../service/financialgoal.service';
 import { PaginationService } from '../service/pagination.service';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 
 @Component({
   standalone: true,
   imports: [
+    ProgressSpinnerModule,
     FormsModule,
     CommonModule,
     ButtonModule,
@@ -69,7 +72,20 @@ import { PaginationService } from '../service/pagination.service';
         class="p-button-raised">
       </p-button>
     </div>
-
+<!-- Mensaje En Construcción -->
+  <div class="construction-section p-6 text-center surface-card border-round shadow-2">
+    <div class="construction-content">
+      <div class="construction-icon mb-4">
+        <i class="pi pi-cog" style="font-size: 4rem; color: #f59e0b; animation: spin 3s linear infinite;"></i>
+      </div>
+      <h2 class="construction-title text-2xl font-bold text-color mb-3">
+        Sección en Construcción
+      </h2>
+      <p class="construction-description text-color-secondary mb-4 line-height-3">
+        Estamos trabajando en esta funcionalidad para brindarte la mejor experiencia.<br>
+        Pronto podrás gestionar tus metas financieras de manera fácil e intuitiva.
+      </p>
+    </div>
     <!-- Filtros -->
     <div class="filters flex gap-3 flex-wrap">
       <p-dropdown
@@ -83,6 +99,13 @@ import { PaginationService } from '../service/pagination.service';
       </p-dropdown>
     </div>
   </div>
+
+    <!-- SPINNER DE CARGA -->
+   @if(isLoading){
+    <div class="flex justify-center items-center py-8">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #6366f1;"></i>
+    </div>
+  }
 
   <!-- Timeline -->
   <div class="timeline-container">
@@ -241,7 +264,7 @@ import { PaginationService } from '../service/pagination.service';
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="filteredGoals.length === 0"
+  <div *ngIf="filteredGoals.length === 0 && !isLoading"
        class="empty-state text-center surface-card border-round shadow-1 p-6">
     <i class="pi pi-inbox text-6xl text-color-secondary mb-4 block"></i>
     <h3 class="text-color font-bold mb-2">No hay metas financieras</h3>
@@ -870,6 +893,7 @@ export class FinancialGoalsComponent implements OnInit {
   goalDialog = false;
   goal: FinancialGoal = this.getEmptyGoal();
   isEditMode = false;
+  isLoading = false
 
   statusOptions = [
     { label: 'Todas', value: null },
@@ -917,12 +941,15 @@ export class FinancialGoalsComponent implements OnInit {
   }
 
   loadGoals() {
+    this.isLoading = true
     this.financialGoalService.getFinancialGoals({ page: 1, results: 100 }).subscribe({
       next: (response) => {
         this.goals = response.items;
         this.processGoalsData();
+        this.isLoading = false
       },
       error: (error) => {
+        this.isLoading = false
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
