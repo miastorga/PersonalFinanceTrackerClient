@@ -72,20 +72,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
         class="p-button-raised">
       </p-button>
     </div>
-<!-- Mensaje En Construcción -->
-  <div class="construction-section p-6 text-center surface-card border-round shadow-2">
-    <div class="construction-content">
-      <div class="construction-icon mb-4">
-        <i class="pi pi-cog" style="font-size: 4rem; color: #f59e0b; animation: spin 3s linear infinite;"></i>
-      </div>
-      <h2 class="construction-title text-2xl font-bold text-color mb-3">
-        Sección en Construcción
-      </h2>
-      <p class="construction-description text-color-secondary mb-4 line-height-3">
-        Estamos trabajando en esta funcionalidad para brindarte la mejor experiencia.<br>
-        Pronto podrás gestionar tus metas financieras de manera fácil e intuitiva.
-      </p>
-    </div>
+
     <!-- Filtros -->
     <div class="filters flex gap-3 flex-wrap">
       <p-dropdown
@@ -929,8 +916,8 @@ export class FinancialGoalsComponent implements OnInit {
 
   initializeForm() {
     this.goalForm = this.fb.group({
-      goalName: ['', [Validators.required, Validators.minLength(3)]],
-      description: [''],
+      goalName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      description: ['', [Validators.maxLength(200)]],
       categoryId: ['', Validators.required],
       priority: ['media', Validators.required],
       goalAmount: [0, [Validators.required, Validators.min(1)]],

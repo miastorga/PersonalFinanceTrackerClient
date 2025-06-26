@@ -337,8 +337,7 @@ import { PrimengConfigService } from '../service/primengconfig.service';
                       <label for="description" class="block text-sm font-medium mb-2">Descripción *</label>
                       <input
                         id="description"
-                        type="text"
-                        pInputText
+                        pInputTextarea
                         formControlName="description"
                         placeholder="Ingrese una descripción"
                         class="w-full">
