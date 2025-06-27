@@ -336,12 +336,13 @@ import { PrimengConfigService } from '../service/primengconfig.service';
                     <!-- Descripción -->
                     <div class="field">
                       <label for="description" class="block text-sm font-medium mb-2">Descripción *</label>
-                      <input
+                      <textarea
                         id="description"
                         pInputTextarea
                         formControlName="description"
                         placeholder="Ingrese una descripción"
                         class="w-full">
+                      </textarea>
                         <small class="text-red-500" *ngIf="transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched">
                           {{ getDescriptionErrorMessage() }}
                         </small>

@@ -227,7 +227,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
             <p-inputNumber
               [(ngModel)]="goal.currentAmount"
               mode="currency"
-              currency="CLP"
+              currency="COP"
               locale="es-CO"
               [min]="0"
               [max]="goal.goalAmount"
@@ -368,11 +368,11 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
           <p-inputNumber
             id="goalAmount"
             formControlName="goalAmount"
-            mode="currency"
-            currency="COP"
+            mode="decimal"
             locale="es-CO"
-            [min]="1"
+            [useGrouping]="true"
             placeholder="0"
+            prefix="$"
             class="w-full"
             [class.p-invalid]="goalForm.get('goalAmount')?.invalid && goalForm.get('goalAmount')?.touched">
           </p-inputNumber>
@@ -394,11 +394,11 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
           <p-inputNumber
             id="currentAmount"
             formControlName="currentAmount"
-            mode="currency"
-            currency="COP"
+            mode="decimal"
             locale="es-CO"
-            [min]="0"
+            [useGrouping]="true"
             placeholder="0"
+            prefix="$"
             class="w-full"
             [class.p-invalid]="goalForm.get('currentAmount')?.invalid && goalForm.get('currentAmount')?.touched">
           </p-inputNumber>
