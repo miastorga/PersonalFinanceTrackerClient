@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
@@ -14,9 +14,12 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { catchError, delay, finalize, forkJoin, map, of, tap } from 'rxjs';
 import { CategoriesService, Category } from '../service/categories.service';
 import { PrimengConfigService } from '../service/primengconfig.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouteConfigLoadEnd } from '@angular/router';
+
 
 export interface CreateCategory {
   categoryName: string;
@@ -421,6 +424,9 @@ export class CategoriesCRUD implements OnInit {
     this.savingCategory = false;
   }
 
+  private destroyRef = inject(DestroyRef);
+
+
   onSubmitCategory() {
     if (this.categoryForm.valid) {
       this.savingCategory = true;
@@ -454,27 +460,30 @@ export class CategoriesCRUD implements OnInit {
             }
           });
         } else {
-          // Asumiendo que tienes un método createCategory en tu servicio
-          this.categoriesService.createCategory(categoryData).subscribe({
-            next: (response) => {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Éxito',
-                detail: 'Categoría creada exitosamente'
-              });
-              this.hideAddCategoryDialog();
-              this.loadCategories();
-              this.savingCategory = false;
-            },
-            error: (error) => {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: `Error al crear la categoría: ${error.message}`
-              });
-              this.savingCategory = false;
-            }
-          });
+          this.categoriesService.createCategory(categoryData)
+            .pipe(
+              takeUntilDestroyed(this.destroyRef)
+            )
+            .subscribe({
+              next: (response) => {
+                this.messageService.add({
+                  severity: 'success',
+                  summary: 'Éxito',
+                  detail: 'Categoría creada exitosamente'
+                });
+                this.hideAddCategoryDialog();
+                this.loadCategories();
+                this.savingCategory = false;
+              },
+              error: (error) => {
+                this.messageService.add({
+                  severity: 'error',
+                  summary: 'Error',
+                  detail: `Error al crear la categoría: ${error.message}`
+                });
+                this.savingCategory = false;
+              }
+            });
         }
       } catch (error) {
         this.messageService.add({

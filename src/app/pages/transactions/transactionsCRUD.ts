@@ -230,8 +230,8 @@ import { PrimengConfigService } from '../service/primengconfig.service';
               </div>
             </td>
             <td>
-            {{ transaction.amount | currency:'USD':'symbol':'1.0-0' }}
-                      </td>
+              {{ transaction.amount | currency:'USD':'symbol':'1.0-0' }}
+            </td>
             <td>
               <div class="flex items-center gap-2">
                 <span>{{ transaction.categoryName }}</span>
@@ -322,8 +322,9 @@ import { PrimengConfigService } from '../service/primengconfig.service';
                         id="amount"
                         formControlName="amount"
                         mode="decimal"
+                        locale="es-CO"
                         [useGrouping]="true"
-                        placeholder="0.00"
+                        placeholder="0"
                         prefix="$"
                         class="w-full">
                       </p-inputNumber>

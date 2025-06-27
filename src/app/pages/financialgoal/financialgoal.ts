@@ -227,7 +227,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
             <p-inputNumber
               [(ngModel)]="goal.currentAmount"
               mode="currency"
-              currency="COP"
+              currency="CLP"
               locale="es-CO"
               [min]="0"
               [max]="goal.goalAmount"
@@ -525,9 +525,9 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     .timeline-line {
       position: absolute;
       left: 1.5rem;
-      top: 2rem;
+      top:  3.3rem;
       width: 4px;
-      height: calc(100% + 1rem);
+      height: calc(100%);
       background: var(--surface-border);
       border-radius: 2px;
     }

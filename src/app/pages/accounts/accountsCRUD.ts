@@ -308,6 +308,7 @@ import { PrimengConfigService } from '../service/primengconfig.service';
                 formControlName="currentBalance"
                 mode="decimal"
                 [useGrouping]="true"
+                locale="es-CO"
                 placeholder="0.00"
                 prefix="$"
                 class="w-full">
@@ -330,6 +331,7 @@ import { PrimengConfigService } from '../service/primengconfig.service';
                 id="initialBalance"
                 formControlName="initialBalance"
                 [useGrouping]="true"
+                locale="es-CO"
                 placeholder="0.00"
                 prefix="$"
                 class="w-full"
