@@ -226,13 +226,14 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
           <div class="update-controls flex gap-2 align-items-center">
             <p-inputNumber
               [(ngModel)]="goal.currentAmount"
-              mode="currency"
-              currency="COP"
+              mode="decimal"
               locale="es-CO"
               [min]="0"
+              prefix="$"
               [max]="goal.goalAmount"
               size="small"
               (onBlur)="updateProgress(goal)"
+              selectOnFocus="false"
               class="flex-1">
             </p-inputNumber>
             <p-button
