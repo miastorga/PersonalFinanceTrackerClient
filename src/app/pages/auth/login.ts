@@ -44,7 +44,7 @@ import { MessageService } from 'primeng/api';
                             </svg>
                             <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Inicio de Sesion</div>
                             <button type="button"  class="text-muted-color font-medium">Inicia sesion para continuar</button>
-                            <p class="mt-3">Otras cuentas de prueba</p>
+                            <p class="mt-3">Otras cuentas de prueba o <span class="font-bold"> crea una cuenta nueva</span> </p>
                             <div class="text-surface-900 dark:text-surface-0 text-1xl font-medium mb-1 flex justify-between">
                               <p>prueba&#64;gmail.com</p>
                               <p>Hola123$</p>
